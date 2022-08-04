@@ -1,0 +1,12 @@
+[
+    {
+        "name": "dev-server",
+        "ip": "159.223.168.228",
+        "username": "root",
+        "password": "sv@LHN%M967V",
+        "port": "22",
+        "beforeHooks": "",
+        "afterHooks": "",
+        "path": "/var/www/html/shopify-mpv-sync"
+    }
+]
