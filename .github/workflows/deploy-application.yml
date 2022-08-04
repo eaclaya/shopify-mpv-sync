@@ -1,58 +1,27 @@
-name: Deploy Application
+name: Deploy application
+
+# Trigger the workflow on push and
+# pull request events on the production branch
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
+# Authenticate to the the server via ssh
+# and run our deployment script
 jobs:
-  create-deployment-artifacts:
-    name: Create deployment aritifacts
+  deploy:
     runs-on: ubuntu-latest
-    outputs:
-      deployment-matrix: ${{ steps.export-deployment-matrix.outputs.deployment-matrix }}
-
     steps:
       - uses: actions/checkout@v2
-
-      - name: Compile CSS and Javascript
-        run: |
-          npm install 
-          npm run build
-      - name: Configure PHP 8.0
-        uses: shivammathur/setup-php@master
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
         with:
-          php-version: 8.1
-          extensions: mbstring, ctype, fileinfo, openssl, PDO, bcmath, json, tokenizer, xml
-      - name: Install composer dependencies
-        run: composer install --no-dev --no-interaction --prefer-dist
-      - name: Create deployment artifact
-        env:
-          GITHUB_SHA: ${{ github.sha }}
-        run: tar -czf "${GITHUB_SHA}".tar.gz  --exclude=*.git --exclude=node_modules *
-
-      - name: Store artifact for distribution
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-build
-          path: ${{ github.sha }}.tar.gz
-
-      - name: Export deployment matrix
-        id: export-deployment-matrix
-        run: |
-          JSON="${cat ./deployment-config.json}"
-          JSON="${JSON//'%'/'%25'}"
-          JSON="${JSON//$'\n'/'%0A'}"
-          JSON="${JSON//$'\r'/'%0D'}"
-          echo "::set-output name=deployment-matrix::$JSON"
-
-  prepare-release-on-server:
-    runs-on: ubuntu-latest
-    needs: create-deployment-artifacts
-    strategy:
-      matrix:
-        server: ${{ fromJson(needs.create-deployment-artifacts.outputs.deployment-matrix ) }}
-
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: app-build
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSHKEY }}
+          script: "cd /var/www/html && ./.scripts/deploy.sh"
