@@ -3,6 +3,7 @@ namespace App\Repositories;
 
 use App\Facades\Shopify;
 use App\Models\Product;
+use Illuminate\Support\Arr;
 
 class ProductRepository
 {
@@ -30,26 +31,39 @@ class ProductRepository
 
     public function update(Product $product){
         $data = [
-            'title' => $product->notes,
-            'status' => 'active',
-            'published' => true,
-            'variants' => [
-                            [
-                                "option1" => "Default Title",
-                                "price" => $product->price,
-                                "sku" => $product->product_key
-                            ]
-                        ],
-            'images' => [
-                [
-                    "src" => $product->picture
+            'product' => [
+                'title' => $product->notes,
+                'body' => $product->notes,
+                'vendor' => 'KM Motos',
+                'status' => 'active',
+                'published' => true,
+                'variants' => [
+                                [
+                                    "option1" => "Default Title",
+                                    "price" => $product->price,
+                                    "sku" => $product->product_key,
+                                    "inventory_quantity" => $product->qty
+                                ]
+                            ],
+                'images' => [
+                    [
+                        "src" => $product->picture
+                        ]
                     ]
-                ]
+            ]
         ];
-        $response = Shopify::post("products", $data);
-        if(isset($response['errors'])){
-            throw new \Exception($response['errors']);
+        $response = [];
+        if($product->shopify_product_id){
+            $data['product']['id'] = $product->shopify_product_id;
+            $response = Shopify::put("products/{$product->shopify_product_id}", $data);
         }else{
+            $response = Shopify::post("products", $data);
+        }
+        if(isset($response['errors'])){
+            $errors = Arr::flatten($response['errors']);
+            throw new \Exception(implode(', ', $errors));
+        }
+        if($response && isset($response['product'])){
             $product->shopify_product_id = $response['product']['id'];
             $product->save();
         }

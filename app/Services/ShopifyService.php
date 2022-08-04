@@ -6,26 +6,27 @@ class ShopifyService
 {
     public function get($uri)
     {
-        try{
-            $response = Http::withHeaders($this->getHeaders())
-                        ->get($this->getEndpoint($uri));
-            return $response->json();   
-        }catch(\Exception $e){
-            return ['errors' => $e->getMessage()];
-        }
+        return $this->makeHttRequest($uri, [], 'get');
     }
 
     public function post($uri, $data){
+        return $this->makeHttRequest($uri, $data, 'post');
+    }
+
+    public function put($uri, $data){
+        return $this->makeHttRequest($uri, $data, 'put');
+    }
+
+    protected function makeHttRequest($uri, $data = [], $method = 'get'){
         try{
             $response = Http::withHeaders($this->getHeaders())
-                        ->post($this->getEndpoint($uri), [
-                            'product' => $data
-                        ]);
+                        ->$method($this->getEndpoint($uri), $data);
             return $response->json();   
         }catch(\Exception $e){
-            return ['errors' => $e->getMessage()];
+            return ['errors' => [$e->getMessage()]];
         }
     }
+
     protected function getEndpoint($uri)
     {
         $uri = str_replace('.json', '', $uri);
