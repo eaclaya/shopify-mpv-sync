@@ -26,18 +26,18 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach ($products as $product)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">{{$product->product_key}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{$product->notes}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{$product->qty}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{$product->price}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{$product->shopify_product_id ? 'Sincronizado' : 'Pendiente'}}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{$product['product_key']}}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{$product['notes']}}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{$product['qty']}}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{$product['price']}}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{$product['shopify_product_id'] ? 'Sincronizado' : 'Pendiente'}}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            @if($product->shopify_product_id)
-                                <a href="{{$product->shopify_product_url}}" target="_blank" class="text-indigo-600 hover:text-indigo-900">
+                            @if($product['shopify_product_id'])
+                                <a href="{{$product['shopify_product_url']}}" target="_blank" class="text-indigo-600 hover:text-indigo-900">
                                     Ver en Shopify
                                 </a>
                             @else
-                            <form action="{{route('products.update', $product->id)}}" method="POST">
+                            <form action="{{route('products.update', $product['id'])}}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <button type="submit" class="text-indigo-600 hover:text-indigo-900">

@@ -8,7 +8,20 @@ class ProductRepository
 {
     public function all()
     {
-        return Product::sync()->get();
+        $host = config('services.shopify.host');
+        return  Product::sync()->get()->map(function($product) use ($host){
+            return [
+                'id' => $product->id,
+                'notes' => $product->notes,
+                'product_key' => $product->product_key,
+                'qty' => $product->qty,
+                'price' => $product->price,
+                'picture' => $product->picture,
+                'shopify_product_id' => $product->shopify_product_id,
+                'shopify_product_url' => $product->shopify_product_id ? "https://{$host}.myshopify.com/admin/products/{$product->shopify_product_id}" : null,
+                'shopify_sync' => $product->shopify_sync
+            ];
+        });
     }
 
     public function filter($filter){
