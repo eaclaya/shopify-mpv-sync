@@ -24,7 +24,13 @@ return [
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
-
+    'shopify' => [
+        'host' => env('SHOPIFY_HOST'),
+        'key' => env('SHOPIFY_KEY'),
+        'secret' => env('SHOPIFY_SECRET'),
+        'access_token' => env('SHOPIFY_ACCESS_TOKEN'),
+        'version' => env('SHOPIFY_VERSION'),
+    ],
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
