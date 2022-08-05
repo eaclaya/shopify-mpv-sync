@@ -18,7 +18,8 @@ class UserController extends Controller
     
     public function update(User $user, Request $request){
         $token = $request->user()->createToken($user->email);
-        request()->session()->flash('success', 'User updated successfully');
+        $plainToken = $token->plainTextToken;
+        request()->session()->flash('success', "Token created successfully: {$plainToken}");
         return redirect()->route('users.index');
     }
 }
