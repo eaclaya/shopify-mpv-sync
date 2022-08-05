@@ -29,33 +29,33 @@ class ProductRepository
         return Product::sync()->where('notes', 'like', "%$filter%")->where('product_key', $filter)->get();
     }
 
-    public function update(Product $product){
+    public function update($product){
         $data = [
             'product' => [
-                'title' => $product->notes,
-                'body' => $product->notes,
+                'title' => $product['notes'],
+                'body' => $product['notes'],
                 'vendor' => 'KM Motos',
                 'status' => 'active',
                 'published' => true,
                 'variants' => [
                                 [
                                     "option1" => "Default Title",
-                                    "price" => $product->price,
-                                    "sku" => $product->product_key,
-                                    "inventory_quantity" => $product->qty
+                                    "price" => $product['price'],
+                                    "sku" => $product['product_key'],
+                                    "inventory_quantity" => $product['qty']
                                 ]
                             ],
                 'images' => [
                     [
-                        "src" => $product->picture
+                        "src" => $product['picture']
                         ]
                     ]
             ]
         ];
         $response = [];
-        if($product->shopify_product_id){
-            $data['product']['id'] = $product->shopify_product_id;
-            $response = Shopify::put("products/{$product->shopify_product_id}", $data);
+        if(isset($product['shopify_product_id'])){
+            $data['product']['id'] = $product['shopify_product_id'];
+            $response = Shopify::put("products/{$product['shopify_product_id']}", $data);
         }else{
             $response = Shopify::post("products", $data);
         }
@@ -63,10 +63,10 @@ class ProductRepository
             $errors = Arr::flatten($response['errors']);
             throw new \Exception(implode(', ', $errors));
         }
-        if($response && isset($response['product'])){
-            $product->shopify_product_id = $response['product']['id'];
-            $product->save();
-        }
-        return $product;
+        // if($response && isset($response['product'])){
+        //     $product->shopify_product_id = $response['product']['id'];
+        //     $product->save();
+        // }
+        return $response;
     }
 }

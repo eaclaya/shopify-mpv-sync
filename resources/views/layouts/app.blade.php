@@ -30,7 +30,26 @@
                     </div>
                 </header>
             @endif
+            
+             @if(session()->has('success'))
+            <div class="bg-green-400 text-white px-8 py-2 my-2 rounded-sm text-center font-semibold z-40">
+                {{ session()->get('success') }}
+            </div>
+            @endif
 
+            @if(session()->has('error'))
+            <div class="bg-red-400 text-white px-8 py-2 my-2 rounded-sm text-center font-semibold z-40">
+                {{ session()->get('error') }}
+            </div>
+            @endif
+
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="bg-red-400 text-white px-8 py-2 my-2 rounded-sm text-center font-semibold z-40">
+                    {{ $error }}
+                    </div>
+                @endforeach
+            @endif
             <!-- Page Content -->
             <main class="w-full py-6 px-4 lg:px-8">
                 {{ $slot }}
