@@ -63,10 +63,14 @@ class ProductRepository
             $errors = Arr::flatten($response['errors']);
             throw new \Exception(implode(', ', $errors));
         }
-        // if($response && isset($response['product'])){
-        //     $product->shopify_product_id = $response['product']['id'];
-        //     $product->save();
-        // }
+        if(isset($response['id'])){
+            Shopify::post('collects', [
+                'collect' => [
+                    'product_id' => $response['id'],
+                    'collection_id' => config('services.shopify.collection_id')
+                ]
+            ]);
+        }
         return $response;
     }
 }
