@@ -63,10 +63,6 @@ class ProductRepository
             $errors = Arr::flatten($response['errors']);
             throw new \Exception(implode(', ', $errors));
         }
-        // if($response && isset($response['product'])){
-        //     $product->shopify_product_id = $response['product']['id'];
-        //     $product->save();
-        // }
         return $response;
     }
 }
