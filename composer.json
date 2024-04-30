@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.5",
         "openai-php/client": "^0.4.1",
-        "shopify/shopify-api": "^2.0"
+        "shopify/shopify-api": "^2.0",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
