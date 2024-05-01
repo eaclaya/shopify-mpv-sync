@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('chat_bot', function (Blueprint $table) {
+            $table->id();
+            $table->integer('social_network');
+            $table->string('instance');
+            $table->string('contact');
+            $table->integer('status');
+            $table->integer('message_type');
+            $table->string('message_id');
+            $table->string('referenced_message_id')->nullable();
+            $table->text('received_message_text')->nullable();
+            $table->text('response_message')->nullable();
+            $table->string('media_file')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('chat_bot');
+    }
+};
