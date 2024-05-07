@@ -21,16 +21,19 @@ class ChatBot extends Model
         'referenced_message_id',
         'received_message_text',
         'response_message',
-        'media_file'
+        'media_file',
+        'thread',
+        'verify_response'
     ];
 
     protected $table = 'chat_bot';
 
     protected $status_reference = [
         0 => 'received',
-        1 => 'answered',
-        2 => 'pending',
-        3 => 'read'
+        1 => 'answered_by_user',
+        2 => 'answered_by_chatbot',
+        3 => 'finished',
+        4 => 'in_process',
     ];
 
     protected $message_type_reference = [

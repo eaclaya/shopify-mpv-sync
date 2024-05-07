@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac3bbac325567ab7cf2ffc0ca10f785a",
+    "content-hash": "49a5a8085560cc9fc60617135f987c73",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2896,38 +2896,39 @@
         },
         {
             "name": "openai-php/client",
-            "version": "v0.4.2",
+            "version": "v0.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/openai-php/client.git",
-                "reference": "bbfbc0a28872d679d6990712d7feaae2c9f96fc2"
+                "reference": "0f755fafa4d3f8d5c8ed964d3166d078fac0605a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openai-php/client/zipball/bbfbc0a28872d679d6990712d7feaae2c9f96fc2",
-                "reference": "bbfbc0a28872d679d6990712d7feaae2c9f96fc2",
+                "url": "https://api.github.com/repos/openai-php/client/zipball/0f755fafa4d3f8d5c8ed964d3166d078fac0605a",
+                "reference": "0f755fafa4d3f8d5c8ed964d3166d078fac0605a",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.1.0",
-                "php-http/discovery": "^1.15.3",
-                "php-http/multipart-stream-builder": "^1.2.0",
-                "psr/http-client": "^1.0.2",
+                "php-http/discovery": "^1.19.4",
+                "php-http/multipart-stream-builder": "^1.3.0",
+                "psr/http-client": "^1.0.3",
                 "psr/http-client-implementation": "^1.0.1",
                 "psr/http-factory-implementation": "*",
-                "psr/http-message": "^1.1.0"
+                "psr/http-message": "^1.1.0|^2.0.0"
             },
             "require-dev": {
-                "guzzlehttp/guzzle": "^7.5.0",
-                "guzzlehttp/psr7": "^2.4.4",
-                "laravel/pint": "^1.8.0",
-                "nunomaduro/collision": "^7.4.0",
-                "pestphp/pest": "^2.4.0",
-                "pestphp/pest-plugin-arch": "^2.1.1",
-                "pestphp/pest-plugin-mock": "^2.0.0",
-                "phpstan/phpstan": "^1.10.11",
-                "rector/rector": "^0.14.8",
-                "symfony/var-dumper": "^6.2.8"
+                "guzzlehttp/guzzle": "^7.8.1",
+                "guzzlehttp/psr7": "^2.6.2",
+                "laravel/pint": "^1.15.0",
+                "mockery/mockery": "^1.6.11",
+                "nunomaduro/collision": "^7.10.0",
+                "pestphp/pest": "^2.34.6",
+                "pestphp/pest-plugin-arch": "^2.7",
+                "pestphp/pest-plugin-type-coverage": "^2.8.1",
+                "phpstan/phpstan": "^1.10.66",
+                "rector/rector": "^1.0.4",
+                "symfony/var-dumper": "^6.4.4"
             },
             "type": "library",
             "autoload": {
@@ -2967,7 +2968,7 @@
             ],
             "support": {
                 "issues": "https://github.com/openai-php/client/issues",
-                "source": "https://github.com/openai-php/client/tree/v0.4.2"
+                "source": "https://github.com/openai-php/client/tree/v0.8.5"
             },
             "funding": [
                 {
@@ -2983,7 +2984,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-04-12T04:26:02+00:00"
+            "time": "2024-04-15T19:11:23+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -3574,16 +3575,16 @@
         },
         {
             "name": "psr/http-message",
-            "version": "1.1",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-message.git",
-                "reference": "cb6ce4845ce34a8ad9e68117c10ee90a29919eba"
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/cb6ce4845ce34a8ad9e68117c10ee90a29919eba",
-                "reference": "cb6ce4845ce34a8ad9e68117c10ee90a29919eba",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
                 "shasum": ""
             },
             "require": {
@@ -3592,7 +3593,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -3607,7 +3608,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interface for HTTP messages",
@@ -3621,9 +3622,9 @@
                 "response"
             ],
             "support": {
-                "source": "https://github.com/php-fig/http-message/tree/1.1"
+                "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
-            "time": "2023-04-04T09:50:52+00:00"
+            "time": "2023-04-04T09:54:51+00:00"
         },
         {
             "name": "psr/log",
@@ -6852,16 +6853,16 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.15.2",
+            "version": "v1.15.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "2c9f8004899815f3f0ee3cb28ef7281e2b589134"
+                "reference": "3600b5d17aff52f6100ea4921849deacbbeb8656"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/2c9f8004899815f3f0ee3cb28ef7281e2b589134",
-                "reference": "2c9f8004899815f3f0ee3cb28ef7281e2b589134",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/3600b5d17aff52f6100ea4921849deacbbeb8656",
+                "reference": "3600b5d17aff52f6100ea4921849deacbbeb8656",
                 "shasum": ""
             },
             "require": {
@@ -6914,7 +6915,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2024-04-23T15:42:34+00:00"
+            "time": "2024-04-30T15:02:26+00:00"
         },
         {
             "name": "laravel/sail",
@@ -8777,16 +8778,16 @@
         },
         {
             "name": "spatie/flare-client-php",
-            "version": "1.4.4",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/flare-client-php.git",
-                "reference": "17082e780752d346c2db12ef5d6bee8e835e399c"
+                "reference": "9aa60f6ded35a774554e7a5256dca12b72693b78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/17082e780752d346c2db12ef5d6bee8e835e399c",
-                "reference": "17082e780752d346c2db12ef5d6bee8e835e399c",
+                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/9aa60f6ded35a774554e7a5256dca12b72693b78",
+                "reference": "9aa60f6ded35a774554e7a5256dca12b72693b78",
                 "shasum": ""
             },
             "require": {
@@ -8834,7 +8835,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/flare-client-php/issues",
-                "source": "https://github.com/spatie/flare-client-php/tree/1.4.4"
+                "source": "https://github.com/spatie/flare-client-php/tree/1.5.0"
             },
             "funding": [
                 {
@@ -8842,7 +8843,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-31T14:18:45+00:00"
+            "time": "2024-05-02T13:18:42+00:00"
         },
         {
             "name": "spatie/ignition",

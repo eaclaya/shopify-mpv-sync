@@ -24,7 +24,10 @@ return new class extends Migration
             $table->string('referenced_message_id')->nullable();
             $table->text('received_message_text')->nullable();
             $table->text('response_message')->nullable();
-            $table->string('media_file')->nullable();
+            $table->text('media_file')->nullable();
+            $table->integer('is_download')->default(0);
+            $table->string('thread')->nullable();
+            $table->integer('verify_response')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });
