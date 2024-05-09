@@ -14,7 +14,7 @@ class WhatsappApiController extends Controller
         $this->whatsappService = $whatsappService;
     }
 
-    public function hook(Request $request)
+    public function hook(Request $request): bool
     {
         $input = $request->all();
         Log::info('Whatsapp Webhook Init');

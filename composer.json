@@ -17,7 +17,7 @@
         "livewire/livewire": "^2.5",
         "openai-php/client": "^0.8.5",
         "shopify/shopify-api": "^2.0",
-        "ext-openssl": "*",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

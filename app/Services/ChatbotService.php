@@ -1,13 +1,12 @@
 <?php
 namespace App\Services;
-use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Facades\Http;
 use App\Repositories\ChatbotRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 use OpenAI;
-use function PHPUnit\Framework\isFalse;
 
 class ChatbotService
 {
@@ -35,7 +34,8 @@ class ChatbotService
     {
         $lastMessage = $this->chatbotRepository->getLastChatMessage($chat);
         Log::info('chat bot service lastMessage', [$lastMessage]);
-        switch ($lastMessage->status){
+        if(isset($lastMessage)){
+            switch ($lastMessage->status){
             case 0:
                 $response_message = $this->processChat($chat, 0, null);
                 $this->chatbotRepository->update($chat, [
@@ -101,6 +101,11 @@ class ChatbotService
                 }
                 break;
         }
+        }else{
+            $this->chatbotRepository->update($chat, [
+                'status' => 0,
+            ]);
+        }
         return true;
     }
 
@@ -148,26 +153,11 @@ class ChatbotService
         ];
     }
 
-    protected function getInfoInstance($instance): array|bool
-    {
-        $whatsappConfig = \App\Models\WhatsappConfigAccount::query()
-            ->where('instance_id', $instance)
-            ->first();
-
-        if(!isset($whatsappConfig->active_messages) || !$whatsappConfig->active_messages){
-            return false;
-        }
-        if((!isset($whatsappConfig->instance_id) || trim($whatsappConfig->instance_id) == "") || (!isset($whatsappConfig->access_token) || trim($whatsappConfig->access_token) == "")){
-            return false;
-        }
-        return $whatsappConfig->toArray();
-    }
-
     protected function processChat($chat, $typeAction, $lastMessage = null): string
     {
         if ($chat['social_network'] == 0){
             Log::info('processChat');
-            $infoInstance = $this->getInfoInstance(Arr::get($chat,'instance'));
+            $infoInstance = $this->chatbotRepository->getInfoInstance(Arr::get($chat,'instance'));
             Log::info('processChat $infoInstance', [$infoInstance]);
             $accessToken = Arr::get($infoInstance,'access_token');
             $accountId = Arr::get($infoInstance,'account_id');
@@ -201,13 +191,14 @@ class ChatbotService
 
     protected function chatWithOpenIa($chat,$lastMessage = null,$accountId = null): string
     {
+        $received_message_text = $this->getJsonMessage($chat->received_message_text);
         Log::info('chatWithOpenIa', [$chat,$lastMessage,$accountId]);
         $client = OpenAI::client($this->apiKeyOpenIa);
         $threadId = (isset($lastMessage->thread) && trim($lastMessage->thread) !== "") ? trim($lastMessage->thread) : null;
         if(!is_null($threadId)){
-            $this->messageThreadExist($client,$threadId,$chat->received_message_text);
+            $this->messageThreadExist($client,$threadId,$received_message_text);
         }else{
-            $newMessage = $this->newMessageThread($client,$chat->received_message_text);
+            $newMessage = $this->newMessageThread($client,$received_message_text);
             $threadId = (isset($newMessage->threadId) && trim($newMessage->threadId) !== "") ? trim($newMessage->threadId) : null;
         }
         if (!is_null($threadId)){
@@ -270,7 +261,7 @@ class ChatbotService
         $product = Arr::get($arrResp, 'product') ?? null;
         Log::info('evalResponse', [$product]);
         if($action == 'search'){
-            $returnResponse .= $this->consultProduct($product,$accountId);
+            $returnResponse .= $this->consultProduct($product,$accountId,$chat->thread);
         }
         $this->chatbotRepository->update($chat, [
             'status' => 4,
@@ -279,16 +270,12 @@ class ChatbotService
         return $returnResponse;
     }
 
-    protected function consultProduct($product,$accountId): string
+    protected function consultProduct($product,$accountId,$thread): string
     {
         if(!isset($product)){
           return '';
         }
-        $account = DB::connection('mysql_two')->table('accounts')
-            ->select([
-                'name'
-            ])
-            ->find($accountId)->name ?? null;
+        $account = $this->chatbotRepository->getAccountName($accountId);
 
         $productName = Arr::get($product,'name') ?? null;
         $productModel = Arr::get($product,'model') ?? null;
@@ -296,70 +283,13 @@ class ChatbotService
 
         Log::info('consultProduct', [$productName, $productModel, $productBrand]);
 
-        $categories = $this->getIdsModel($productName, 'categories');
-        $vendors = $this->getIdsModel($productBrand, 'vendors');
-        $brands = $this->getIdsModel($productBrand, 'brands');
+        $categories = $this->chatbotRepository->getIdsModel($productName, 'categories');
+        $vendors = $this->chatbotRepository->getIdsModel($productBrand, 'vendors');
+        $brands = $this->chatbotRepository->getIdsModel($productBrand, 'brands');
 
         Log::info('consultProduct', [$categories,$vendors,$brands]);
 
-        $products = DB::connection('mysql_two')
-            ->table('products')
-            ->select([
-                'account_id',
-                'product_key',
-                'notes',
-                'description',
-                'price',
-                'picture',
-                'shopify_product_id',
-                'relation_id',
-                'brand_id',
-                'vendor_id',
-                'category_id',
-                'qty',
-            ])
-            ->where(function ($query) use ($productName, $productModel, $productBrand){
-                $query->where('notes', 'like', '%' . explode(' ', $productName)[0] . '%')
-                    ->orWhere('description', 'like', '%' . explode(' ', $productName)[0] . '%');
-                foreach (explode(' ', $productName) as $value) {
-                    Log::info('consultProduct query product name', [$value]);
-                    $query = $query->orWhere('notes', 'like', '%' . $value . '%')
-                        ->orWhere('description', 'like', '%' . $value . '%');
-                }
-                foreach (explode(' ', $productModel) as $value) {
-                    Log::info('consultProduct query product Model', [$value]);
-                    $query = $query->orWhere('notes', 'like', '%' . $value . '%')
-                        ->orWhere('description', 'like', '%' . $value . '%');
-                    foreach (explode('/', $value) as $val){
-                        $query = $query->orWhere('notes', 'like', '%' . $val . '%')
-                            ->orWhere('description', 'like', '%' . $val . '%');
-                    }
-                    foreach (explode('-', $value) as $val){
-                        $query = $query->orWhere('notes', 'like', '%' . $val . '%')
-                            ->orWhere('description', 'like', '%' . $val . '%');
-                    }
-                }
-                foreach (explode(' ', $productBrand) as $value) {
-                    Log::info('consultProduct query product Brand', [$value]);
-
-                    $query = $query->orWhere('notes', 'like', '%' . $value . '%')
-                        ->orWhere('description', 'like', '%' . $value . '%');
-                }
-            })
-            ->where(function ($query) use ($categories,$vendors,$brands){
-                if(count($categories) > 0){
-                    $query->whereIn('category_id', $categories);
-                }
-                if(count($vendors) > 0){
-                    $query = $query->orWhereIn('vendor_id', $vendors);
-                }
-                if(count($vendors) > 0){
-                    $query = $query->orWhereIn('brand_id', $brands);
-                };
-            })
-            ->where('qty', '>', 0)
-            ->where('account_id', $accountId);
-        $products = $products->take(4)->get();
+        $products = $this->chatbotRepository->searchProducts($productName, $productModel, $productBrand, $categories, $vendors, $brands, $accountId, $thread, true);
 
         $result = '';
         if($products->count() > 0){
@@ -370,64 +300,7 @@ class ChatbotService
             $result .= "\n";
         }
 
-        $productsOthers = DB::connection('mysql_two')
-            ->table('products')
-            ->select([
-                'account_id',
-                'product_key',
-                'notes',
-                'description',
-                'price',
-                'picture',
-                'shopify_product_id',
-                'relation_id',
-                'brand_id',
-                'vendor_id',
-                'category_id',
-                'qty',
-            ])
-            ->where(function ($query) use ($productName, $productModel, $productBrand){
-                $query->where('notes', 'like', '%' . explode(' ', $productName)[0] . '%')
-                    ->orWhere('description', 'like', '%' . explode(' ', $productName)[0] . '%');
-                foreach (explode(' ', $productName) as $value) {
-                    Log::info('consultProduct query product name', [$value]);
-                    $query = $query->orWhere('notes', 'like', '%' . $value . '%')
-                        ->orWhere('description', 'like', '%' . $value . '%');
-                }
-                foreach (explode(' ', $productModel) as $value) {
-                    Log::info('consultProduct query product Model', [$value]);
-                    $query = $query->orWhere('notes', 'like', '%' . $value . '%')
-                        ->orWhere('description', 'like', '%' . $value . '%');
-                    foreach (explode('/', $value) as $val){
-                        $query = $query->orWhere('notes', 'like', '%' . $val . '%')
-                            ->orWhere('description', 'like', '%' . $val . '%');
-                    }
-                    foreach (explode('-', $value) as $val){
-                        $query = $query->orWhere('notes', 'like', '%' . $val . '%')
-                            ->orWhere('description', 'like', '%' . $val . '%');
-                    }
-                }
-                foreach (explode(' ', $productBrand) as $value) {
-                    Log::info('consultProduct query product Brand', [$value]);
-
-                    $query = $query->orWhere('notes', 'like', '%' . $value . '%')
-                        ->orWhere('description', 'like', '%' . $value . '%');
-                }
-            })
-            ->where(function ($query) use ($categories,$vendors,$brands){
-                if(count($categories) > 0){
-                    $query->whereIn('category_id', $categories);
-                }
-                if(count($vendors) > 0){
-                    $query = $query->orWhereIn('vendor_id', $vendors);
-                }
-                if(count($vendors) > 0){
-                    $query = $query->orWhereIn('brand_id', $brands);
-                };
-            })
-            ->where('qty', '>', 0)
-            ->whereNot('account_id', $accountId);
-        $productsOthers = $productsOthers->take(4)->get();
+        $productsOthers = $this->chatbotRepository->searchProducts($productName, $productModel, $productBrand, $categories, $vendors, $brands, $accountId, $thread, false);
 
         if($productsOthers->count() > 0){
             $result .= 'En otras tiendas tenemos los siguientes productos: ' . "\n";
@@ -437,29 +310,6 @@ class ChatbotService
             $result .= "\n". "Puedes ir la tienda " . $account . " para asegurar la disponivilidad, recuerda que puedes finalizar la consulta escribiendo la palabra: Finalizar";
         }
         return $result;
-    }
-
-    protected function getIdsModel($search,$model): array
-    {
-        $nameId = 'id';
-        if(in_array($model,['categories','brands'])){
-            if($model === 'categories'){
-                $nameId = 'category_id';
-            }elseif($model === 'brands'){
-                $nameId = 'brand_id';
-            }
-        }
-        $idsModel = [];
-        $model = DB::connection('mysql_two')->table($model)
-        ->select([
-            $nameId,'name'
-        ])->where('name', 'like', '%' . explode(" ", $search)[0] . '%');
-
-        foreach (explode(" ", $search) as $work){
-            $model = $model->orWhere('name', 'like', '%' . $work . '%');
-        }
-        return $model->pluck($nameId)->toArray();
-
     }
 
     protected function retrieveLastIaMessage($client,$threadId,$count=0): string
@@ -505,4 +355,20 @@ class ChatbotService
         return preg_replace('/[^a-z]/', '', $text);
 
     }
+
+    protected function getJsonMessage($message): string
+    {
+        $categories = $this->chatbotRepository->varSystem('categories');
+        $vendors = $this->chatbotRepository->varSystem('vendors');
+        $brands = $this->chatbotRepository->varSystem('brands');
+        $data = [
+            'message' => $message,
+            'categories' => $categories,
+            'vendors' => $vendors,
+            'brands' => $brands
+        ];
+        return json_encode($data);
+    }
+
+
 }

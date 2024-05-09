@@ -259,8 +259,8 @@ class WhatsappService
         foreach ($data as $item) {
             $fromMe = $item['key']['fromMe'] ?? false;
             if($fromMe){
-//                $this->upsertFromMe($item,$instanceId);
                 Log::info('fromMe', $item);
+                $this->upsertFromMe($item,$instanceId);
             }else{
                 $this->upsert($item,$instanceId);
             }
@@ -269,26 +269,38 @@ class WhatsappService
     }
 
     public function upsertFromMe($item,$instanceId): bool|string{
-        $phone = $item['key']['remoteJid'] ?? null;
-        $phone = $this->clearRemoteJid($phone);
-        $phone = $this->validateNumberWhatsapp($phone);
-        $messageId = $item['key']['id'] ?? null;
-        if(isset($item['message']['extendedTextMessage'])){
-            $message = trim($item['message']['extendedTextMessage']['text']) ?? null;
-            $referencedMessageId = trim($item['message']['extendedTextMessage']['contextInfo']['stanzaId']) ?? null;
-        }else{
-            $message = trim($item['message']['conversation']) ?? null;
+        Log::info('upsertFromMe');
+        if($this->isProtocolMessage($item)){
+            return true;
         }
-        $messageType = $this->searchMessageType($item['message']);
-        /* aca respondi un mensaje, por lo tanto procedo a guardar*/
+        $contact = Arr::get($item, 'key.remoteJid');
+        $contact = $this->clearRemoteJid($contact);
+        if(is_null($contact)){
+            Log::info('upsert',['contact_null']);
+            return false;
+        }
+        $message_id = Arr::get($item, 'key.id');
+        if(isset($item['message']['extendedTextMessage'])){
+            $received_message_text = trim(Arr::get($item, 'message.extendedTextMessage.text'));
+//            $referenced_message_id = trim(Arr::get($item, 'message.extendedTextMessage.contextInfo.stanzaId'));
+        }else{
+            $received_message_text = trim(Arr::get($item, 'message.conversation'));
+//            $referenced_message_id = null;
+        }
+        $data = [
+            'contact' => $contact,
+            'received_message_text' => $received_message_text,
+            'social_network' => 0,
+            'instance' => $instanceId
+        ];
+        Log::info('upsertFromMe data',$data);
+        $lastMessage = $this->chatbotRepo->getIssetChatMessage($data);
         return true;
     }
 
     public function upsert($item,$instance): bool|string{
-        $protocolType = Arr::get($item, 'message.protocolMessage.type') ?? false;
-        if($protocolType !== false){
-            Log::info('upsert',['protocolType']);
-            return false;
+        if($this->isProtocolMessage($item)){
+            return true;
         }
         $contact = Arr::get($item, 'key.remoteJid');
         $contact = $this->clearRemoteJid($contact);
@@ -327,18 +339,13 @@ class WhatsappService
             "received_message_text" => $received_message_text,
             "media_file" => $media_file
         ];
-
         Log::info('finish upsert',$data);
-
         $chat = $this->chatbotRepo->save($data);
         Log::info('finish upsert CHAT', [$chat]);
         $this->chatbotService->selectAction($chat);
         return true;
     }
 
-    /**
-     * @return array
-     */
     public function clearRemoteJid($remoteJid): string|null
     {
         $phone = $remoteJid ? explode('@', $remoteJid)[0] : null;
@@ -382,5 +389,15 @@ class WhatsappService
             $data['mediaKeyTimestamp'] = $media['mediaKeyTimestamp'];
         }
         return json_encode($data,true);
+    }
+
+    public function isProtocolMessage($item): bool
+    {
+        $protocolType = Arr::get($item, 'message.protocolMessage.type') ?? false;
+        if($protocolType !== false){
+            Log::info('upsert',['protocolType']);
+            return true;
+        }
+        return false;
     }
 }
