@@ -172,11 +172,8 @@ class WhatsappService
         return $url_link;
     }
 
-    public function sentSmsClientWhatsapp($number, $message, $instance_id, $access_token, $dataReset = null)
+    public function sentSmsClientWhatsapp($number, $message, $instance_id, $access_token, $dataReset = null):string
     {
-        $headers = [
-            'Content-Type' => 'application/json',
-        ];
         $data = [
             "number" => $number,
             "type" => "text",
@@ -184,35 +181,42 @@ class WhatsappService
             "access_token" => $access_token,
             "message" => $message,
         ];
+        $body = '';
         try {
-            $client = new \GuzzleHttp\Client([ 'headers' => $headers, 'timeout' => 4, 'connect_timeout' => 4]);
-            $response = $client->request('GET', 'https://socializerx.com/api/send', [
-                'query' => $data,
-                'timeout' => 4,
-                'connect_timeout' => 4
-            ]);
-            if($response->getStatusCode() == 200){
-                $body = $response->getBody();
-                $dataResponse = json_decode((string) $body, true);
-                if($dataResponse['status'] == "error"){
-                    if(isset($dataReset)){
-                        $dataReset['error'] = trim($dataResponse['message']);
-                        $body = trim($dataResponse['message']);
-                        if($body !== 'ID de instancia no validada'){
-                            dispatch((new SentApiWhatsapp($dataReset['event'], $dataReset['model']))->delay(1800));
+            $makeHttRequest = $this->chatbotService->makeHttRequest(0, $data,'get');
+            if(isset($makeHttRequest['success'])){
+                $response = $makeHttRequest['success'];
+                if($response->getStatusCode() == 200){
+                    $body = $response->getBody();
+                    $dataResponse = json_decode((string) $body, true);
+                    if($dataResponse['status'] == "error"){
+                        if(isset($dataReset)){
+                            $dataReset['error'] = trim($dataResponse['message']);
+                            $body = trim($dataResponse['message']);
+                            if($body !== 'ID de instancia no validada'){
+                                dispatch((new SentApiWhatsapp($dataReset['event'], $dataReset['model']))->delay(1800));
+                            }
                         }
                     }
+                    if(isset($dataReset)){
+                        $dataReset['success'] = substr($body, 0, 250);
+                        $whatsappErrors = new \App\Models\WhatsappErrors();
+                        $whatsappErrors->saveFirstOrNew($dataReset);
+                    }
+                }else{
+                    $body = 'Estatus: '.$response->getStatusCode();
+                    if(isset($dataReset)){
+                        $dataReset['error'] = $body;
+                        $whatsappErrors = new \App\Models\WhatsappErrors();
+                        $whatsappErrors->saveFirstOrNew($dataReset);
+                        dispatch((new SentApiWhatsapp($dataReset['event'], $dataReset['model']))->delay(1800));
+                    }
                 }
+            }elseif (isset($makeHttRequest['error'])){
+                $body = $makeHttRequest['error'];
                 if(isset($dataReset)){
-                    $dataReset['success'] = substr($body, 0, 250);
-                    $whatsappErrors = new \App\Models\WhatsappErrors();
-                    $whatsappErrors->saveFirstOrNew($dataReset);
-                }
-
-            }else{
-                $body = 'Estatus: '.$response->getStatusCode();
-                if(isset($dataReset)){
-                    $dataReset['error'] = $body;
+                    $dataReset['error'] = substr($body, 0, 250);
+                    $body = $dataReset['error'];
                     $whatsappErrors = new \App\Models\WhatsappErrors();
                     $whatsappErrors->saveFirstOrNew($dataReset);
                     dispatch((new SentApiWhatsapp($dataReset['event'], $dataReset['model']))->delay(1800));

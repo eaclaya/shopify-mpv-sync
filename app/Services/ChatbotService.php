@@ -109,7 +109,7 @@ class ChatbotService
         return true;
     }
 
-    protected function makeHttRequest($social_network, $data = [], $method = 'get'): array
+    public function makeHttRequest($social_network, $data = [], $method = 'get'): array
     {
         Log::info('makeHttRequest init');
         try{
@@ -122,10 +122,10 @@ class ChatbotService
                             $data,
                         );
             Log::info('makeHttRequest response', [$response->json()]);
-            return ['success' => $response->json()];
+            return ['success' => $response];
         }catch(\Exception $e){
             Log::info('makeHttRequest error', [$e]);
-            return ['errors' => [$e->getMessage()]];
+            return ['errors' => $e];
         }
     }
 
@@ -175,7 +175,7 @@ class ChatbotService
         return '';
     }
 
-    protected function getChatMessage($chat,$typeAction,$accountId=null,$lastMessage=null): string|object
+    public function getChatMessage($chat,$typeAction,$accountId=null,$lastMessage=null): string|object
     {
         if($chat->message_type !== 0){
             return 'Por el momento no puedo procesar mensajes de tipo multimedia. Por favor envia un mensaje de texto para que pueda brindarte una mejor asistencia.';
