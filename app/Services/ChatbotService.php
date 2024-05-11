@@ -369,6 +369,5 @@ class ChatbotService
         ];
         return json_encode($data);
     }
-
-
+    
 }
