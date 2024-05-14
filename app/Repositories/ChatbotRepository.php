@@ -45,8 +45,8 @@ class ChatbotRepository
     public function update($chat,$data): \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null {
         $message_id = Arr::get($chat, 'message_id') ?? Arr::get($chat, 'referenced_message_id');
         $chatbot = ChatBot::query()->where('message_id', $message_id)->first();
-        $chatbot->status = Arr::get($data, 'status');
-        $chatbot->response_message .= Arr::get($data, 'response_message') ? Arr::get($data, 'response_message').' *|* ' : '';
+        $chatbot->status = Arr::get($data, 'status')? Arr::get($data, 'status') : $chatbot->status;
+        $chatbot->response_message = (Arr::get($data, 'response_message') && trim(Arr::get($data, 'response_message')) !== '') ? Arr::get($data, 'response_message') : $chatbot->response_message;
         $chatbot->save();
 
         return $chatbot;
@@ -79,36 +79,39 @@ class ChatbotRepository
             $query = $query->where('instance', $message['instance']);
         }
         if(isset($message['contact'])){
-            $chatbot = $query = $query->where('contact', $message['contact']);
+            $query = $query->where('contact', $message['contact']);
+            $chatbot = clone $query;
         }
         if(isset($message['received_message_text']) && str_word_count(trim($message['received_message_text'])) > 1){
             $chatbot = $chatbot->where('response_message', 'like', '%' . $message['received_message_text'] . '%');
         }
-        Log::info('getIssetChatMessage $chatbot query', [
-            $chatbot->toSql(),
-            $chatbot->getBindings()
-        ]);
 
         $chatbot = $chatbot->orderBy('created_at', 'desc')->first();
         Log::info('getIssetChatMessage $chatbot',[$chatbot]);
         try {
             if(!isset($chatbot)){
-                Log::info('getIssetChatMessage isset $chatbot',[true]);
-                $chatbot = $query->orderBy('created_at', 'desc')->first();
+                Log::info('getIssetChatMessage not isset $chatbot',[true]);
+                $currentChatbot = $query->orderBy('created_at', 'desc')->first();
+            }else{
+                $currentChatbot = $chatbot;
             }
-            if(!isset($chatbot)){
+            Log::info('getIssetChatMessage new $currentChatbot',[$currentChatbot]);
+            if(!isset($currentChatbot)){
+                Log::info('getIssetChatMessage not isset newChatbot',[$currentChatbot]);
                 return false;
             }
-            $chatbot->verify_response = true;
-            if($chatbot->status == 0){
+            Log::info('getIssetChatMessage process');
+            $currentChatbot->verify_response = true;
+            if($currentChatbot->status == 0){
                 Log::info('getIssetChatMessage is status 0',[true]);
-                $chatbot->status == 1;
+                $currentChatbot->status = 1;
             }
-            if(isset($message['received_message_text']) && !str_contains($chatbot->received_message_text, $message['received_message_text'])){
+
+            if(isset($message['received_message_text']) && !str_contains($currentChatbot->received_message_text, $message['received_message_text'])){
                 Log::info('getIssetChatMessage not is message bot',[true]);
-                $chatbot->status == 1;
+                $currentChatbot->status = 1;
             }
-            $chatbot->save();
+            $currentChatbot->save();
             return true;
         }catch (\Exception $e){
             Log::info('getIssetChatMessage error',[$e->getMessage()]);
@@ -245,4 +248,33 @@ class ChatbotRepository
             ])
             ->get()->toArray();
     }
+
+    public function checkUnansweredMessages(): \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|array|null
+    {
+        $subQuery = DB::query()
+            ->select([
+                'cb.*',
+                DB::raw('ROW_NUMBER() OVER (PARTITION BY contact ORDER BY created_at DESC) as row_num')
+            ])
+            ->from('chat_bot as cb')
+            ->orderBy('cb.created_at', 'desc')
+            ->where('cb.social_network', 0)
+            ->where('cb.verify_response', 0)
+            ->whereNot('cb.status', 1)
+            ->whereNull('cb.deleted_at');
+
+        $subQuerySql = $subQuery->toSql();
+
+        $chatBotQuery = ChatBot::query()
+            ->from(DB::raw("($subQuerySql) as sub"))
+            ->mergeBindings($subQuery)
+            ->where('row_num', '<=', 2)
+            ->orderBy('created_at', 'desc')
+            ->whereNull('deleted_at')
+            ->withTrashed();
+
+        dump($chatBotQuery->toSql());
+        return $chatBotQuery->get()->groupBy(['instance','contact']);
+    }
+
 }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Jobs\SentApiWhatsapp;
 use Illuminate\Support\Facades\Http;
 use App\Repositories\ChatbotRepository;
 use Illuminate\Support\Arr;
@@ -109,7 +110,7 @@ class ChatbotService
         return true;
     }
 
-    public function makeHttRequest($social_network, $data = [], $method = 'get'): array
+    public function makeHttRequest($social_network, $data = [], $method = 'get'): bool
     {
         Log::info('makeHttRequest init');
         try{
@@ -121,12 +122,13 @@ class ChatbotService
                             $this->getEndpoint($social_network),
                             $data,
                         );
-            Log::info('makeHttRequest response', [$response->json()]);
-            return ['success' => $response];
+            Log::info('makeHttRequest response', [$response]);
+            $responseData = ['success' => $response, 'data' => $data];
         }catch(\Exception $e){
             Log::info('makeHttRequest error', [$e]);
-            return ['errors' => $e];
+            $responseData = ['errors' => $e, 'data' => $data];
         }
+        return $this->processMakeHttRequest($responseData);
     }
 
     protected function getOptions(): array
@@ -169,7 +171,10 @@ class ChatbotService
                 "message" => $this->getChatMessage($chat,$typeAction,$accountId,$lastMessage)
             ];
             Log::info('processChat data', $data);
-            $this->makeHttRequest($chat['social_network'], $data, 'get');
+            $isError = $this->makeHttRequest($chat['social_network'], $data, 'get');
+            $this->chatbotRepository->update($chat, [
+                'sent_error' => $isError,
+            ]);
             return $data["message"];
         }
         return '';
@@ -369,5 +374,31 @@ class ChatbotService
         ];
         return json_encode($data);
     }
-    
+
+    protected function processMakeHttRequest($data): bool
+    {
+        if(isset($data['success'])){
+            $response = $data['success'];
+            Log::info('make Success',[$response]);
+            if($response->getStatusCode() == 200){
+                Log::error('is status 200');
+                $body = $response->getBody();
+                $dataResponse = json_decode((string) $body, true);
+                if($dataResponse['status'] == "error"){
+                    Log::error('is status error',[$dataResponse]);
+                    return true;
+                }
+                return false;
+            }else{
+                $body = 'Estatus: '.$response->getStatusCode();
+                Log::error('not is status 200', [$body]);
+                return true;
+            }
+        }elseif(isset($data['error'])){
+            $body = $data['error'];
+            Log::error('make Error',[$body]);
+            return true;
+        }
+        return true;
+    }
 }

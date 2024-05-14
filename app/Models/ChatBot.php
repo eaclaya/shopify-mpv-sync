@@ -52,4 +52,29 @@ class ChatBot extends Model
         3 => 'instagram',
         4 => 'twitter',
     ];
+
+    public function verifyActive(): bool
+    {
+
+        $creationTime = $this->created_at;
+        $currentTime = now();
+        $differenceInSeconds = $creationTime->diffInSeconds($currentTime);
+        if($differenceInSeconds < 40){
+            return false;
+        }
+        dump($this);
+        if(!isset($this->response_message) || trim($this->response_message) === ''){
+            dump('no response');
+            return false;
+        }
+        if($this->verify_response === 1){
+            dump('verified');
+            return false;
+        }
+        if(!in_array($this->status,[2,4])){
+            dump('not in status');
+            return false;
+        }
+        return true;
+    }
 }
