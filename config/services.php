@@ -30,6 +30,7 @@ return [
         'secret' => env('SHOPIFY_SECRET'),
         'access_token' => env('SHOPIFY_ACCESS_TOKEN'),
         'version' => env('SHOPIFY_VERSION'),
+        'collection_id' => env('SHOPIFY_COLLECTION_ID'),
     ],
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
