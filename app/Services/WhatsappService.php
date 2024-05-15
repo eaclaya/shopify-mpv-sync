@@ -57,7 +57,7 @@ class WhatsappService
 
     public function switchReceiveMessages($message,$phone,$instance_id): bool
     {
-//        https://socializerx.com/api/set_webhook?webhook_url=https://8c1c-200-59-184-228.ngrok-free.app/&enable=true&instance_id=662150A3AE407&access_token=65ac077ef0c0a
+    //    https://socializerx.com/api/set_webhook?webhook_url=https://8c1c-200-59-184-228.ngrok-free.app/&enable=true&instance_id=662150A3AE407&access_token=65ac077ef0c0a
         $message = trim($message);
         if(in_array($message, ['dar_baja','dar_alta'])){
             $phone_search = substr($phone, -8, 8);
@@ -213,7 +213,7 @@ class WhatsappService
         foreach ($data as $item) {
             $fromMe = $item['key']['fromMe'] ?? false;
             if($fromMe){
-                Log::info('fromMe', $item);
+                // Log::info('fromMe', $item);
                 $this->upsertFromMe($item,$instanceId);
             }else{
                 $this->upsert($item,$instanceId);
@@ -223,8 +223,9 @@ class WhatsappService
     }
 
     public function upsertFromMe($item,$instanceId): bool|string{
-        Log::info('upsertFromMe');
+        // Log::info('upsertFromMe');
         if($this->isProtocolMessage($item)){
+            Log::info('upsertFromMe/isProtocolMessage',[true]);
             return true;
         }
         $contact = Arr::get($item, 'key.remoteJid');
@@ -236,10 +237,10 @@ class WhatsappService
         $message_id = Arr::get($item, 'key.id');
         if(isset($item['message']['extendedTextMessage'])){
             $received_message_text = trim(Arr::get($item, 'message.extendedTextMessage.text'));
-//            $referenced_message_id = trim(Arr::get($item, 'message.extendedTextMessage.contextInfo.stanzaId'));
+        //    $referenced_message_id = trim(Arr::get($item, 'message.extendedTextMessage.contextInfo.stanzaId'));
         }else{
             $received_message_text = trim(Arr::get($item, 'message.conversation'));
-//            $referenced_message_id = null;
+        //    $referenced_message_id = null;
         }
         $data = [
             'contact' => $contact,
@@ -247,14 +248,14 @@ class WhatsappService
             'social_network' => 0,
             'instance' => $instanceId
         ];
-        Log::info('upsertFromMe data',$data);
+        // Log::info('upsertFromMe data',$data);
         $lastMessage = $this->chatbotRepo->getIssetChatMessage($data);
         return true;
     }
 
     public function upsert($item,$instance): bool|string{
         if($this->isProtocolMessage($item)){
-            Log::info('upsert',['contact_null']);
+            Log::info('upsert/isProtocolMessage',[true]);
             return true;
         }
         $contact = Arr::get($item, 'key.remoteJid');
@@ -294,9 +295,9 @@ class WhatsappService
             "received_message_text" => $received_message_text,
             "media_file" => $media_file
         ];
-        Log::info('finish upsert',$data);
+        // Log::info('finish upsert',$data);
         $chat = $this->chatbotRepo->save($data);
-        Log::info('finish upsert CHAT', [$chat]);
+        // Log::info('finish upsert CHAT', [$chat]);
         $this->chatbotService->selectAction($chat);
         return true;
     }

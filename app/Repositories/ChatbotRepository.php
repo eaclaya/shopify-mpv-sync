@@ -43,14 +43,14 @@ class ChatbotRepository
     }
 
     public function update($chat,$data): \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null {
-        Log::info('chatbotRepo updated init, chat data', [$chat,$data]);
+        // Log::info('chatbotRepo updated init, chat data', [$chat,$data]);
         $message_id = Arr::get($chat, 'message_id') ?? Arr::get($chat, 'referenced_message_id');
         $chatbot = ChatBot::query()->where('message_id', $message_id)->first();
-        Log::info('chatbotRepo updated, chatbot model init', [$chatbot]);
+        // Log::info('chatbotRepo updated, chatbot model init', [$chatbot]);
         $chatbot->status = Arr::get($data, 'status')? Arr::get($data, 'status') : $chatbot->status;
         $chatbot->response_message = (Arr::get($data, 'response_message') && trim(Arr::get($data, 'response_message')) !== '') ? Arr::get($data, 'response_message') : $chatbot->response_message;
         $chatbot->save();
-        Log::info('chatbotRepo updated, chatbot model finish', [$chatbot]);
+        // Log::info('chatbotRepo updated, chatbot model finish', [$chatbot]);
         return $chatbot;
     }
 
@@ -89,32 +89,32 @@ class ChatbotRepository
         }
 
         $chatbot = $chatbot->orderBy('created_at', 'desc')->first();
-        Log::info('getIssetChatMessage $chatbot',[$chatbot]);
+        // Log::info('getIssetChatMessage $chatbot',[$chatbot]);
         try {
             if(!isset($chatbot)){
-                Log::info('getIssetChatMessage not isset $chatbot',[true]);
+                // Log::info('getIssetChatMessage not isset $chatbot',[true]);
                 $currentChatbot = $query->orderBy('created_at', 'desc')->first();
             }else{
                 $currentChatbot = $chatbot;
             }
-            Log::info('getIssetChatMessage new $currentChatbot',[$currentChatbot]);
+            // Log::info('getIssetChatMessage new $currentChatbot',[$currentChatbot]);
             if(!isset($currentChatbot)){
-                Log::info('getIssetChatMessage not isset newChatbot',[$currentChatbot]);
+                // Log::info('getIssetChatMessage not isset newChatbot',[$currentChatbot]);
                 return false;
             }
-            Log::info('getIssetChatMessage process');
+            // Log::info('getIssetChatMessage process');
             $currentChatbot->verify_response = true;
             if($currentChatbot->status == 0){
-                Log::info('getIssetChatMessage is status 0',[true]);
+                // Log::info('getIssetChatMessage is status 0',[true]);
                 $currentChatbot->status = 1;
             }elseif(isset($message['received_message_text']) && !str_contains(trim($message['received_message_text']), trim($currentChatbot->response_message))){
-                Log::info('getIssetChatMessage not is message bot',[true]);
+                // Log::info('getIssetChatMessage not is message bot',[true]);
                 $currentChatbot->status = 1;
             }
             $currentChatbot->save();
             return true;
         }catch (\Exception $e){
-            Log::info('getIssetChatMessage error',[$e->getMessage()]);
+            // Log::info('getIssetChatMessage error',[$e->getMessage()]);
             return false;
         }
     }
@@ -165,31 +165,38 @@ class ChatbotRepository
                 'qty',
             ])
             ->where(function ($query) use ($productName, $productModel, $productBrand){
+                $productName = trim($productName);
                 $query->where('notes', 'like', '%' . explode(' ', $productName)[0] . '%');
                 foreach (explode('/', $productName) as $valuePm) {
                     $valuePm = trim($valuePm);
                     foreach (explode(' ', $valuePm) as $value) {
                         $value = trim($value);
-                        Log::info('consultProduct query product name', [$value]);
+                        if($value == ""){ continue;}
+                        // Log::info('consultProduct query product name value', [$value]);
                         $query = $query->orWhere('notes', 'like', '%' . $value . '%');
                     }
                 }
                 foreach (explode(' ', $productModel) as $value) {
                     $value = trim($value);
-                    Log::info('consultProduct query product Model', [$value]);
+                    // Log::info('consultProduct query product Model', [$value]);
                     $query = $query->orWhere('notes', 'like', '%' . $value . '%');
                     foreach (explode('/', $value) as $val){
                         $val = trim($val);
+                        if($val == ""){ continue;}
+                        // Log::info('consultProduct query product Model', [$val]);
                         $query = $query->orWhere('notes', 'like', '%' . $val . '%');
                     }
                     foreach (explode('-', $value) as $val){
                         $val = trim($val);
+                        if($val == ""){ continue;}
+                        // Log::info('consultProduct query product Model', [$val]);
                         $query = $query->orWhere('notes', 'like', '%' . $val . '%');
                     }
                 }
                 foreach (explode(' ', $productBrand) as $value) {
                     $value = trim($value);
-                    Log::info('consultProduct query product Brand', [$value]);
+                    if($value == ""){ continue;}
+                    // Log::info('consultProduct query product Brand', [$value]);
                     $query = $query->orWhere('notes', 'like', '%' . $value . '%');
                 }
             })
@@ -214,9 +221,9 @@ class ChatbotRepository
             $products = $products->whereNotIn('product_key', $skipKey);
         }
         $products = $products->take(4)->get();
-        Log::info('searchProducts $products', [$products]);
+        // Log::info('searchProducts $products', [$products]);
         $skipKey = array_merge($skipKey,$products->pluck('product_key')->toArray());
-        Log::info('searchProducts $skipKey', [$skipKey]);
+        // Log::info('searchProducts $skipKey', [$skipKey]);
         Cache::put('skip_key_'.$thread.$inAccount, $skipKey, now()->addMinutes(30));
         return $products;
     }
