@@ -35,8 +35,8 @@ class WhatsappService
         $instanceId = $input['instance_id'] ?? null;
         $data = $input['data']['data'] ?? null;
         $event = isset($input['data']['event']) ? explode('.', $input['data']['event']) : null;
-//        Log::info('selectAction', $data);
         if(is_null($data) || is_null($event)){
+            Log::info('selectAction fail null $data or $event', [$instanceId, $data, $event]);
             return false;
         }
         switch ($event[0]) {
@@ -254,6 +254,7 @@ class WhatsappService
 
     public function upsert($item,$instance): bool|string{
         if($this->isProtocolMessage($item)){
+            Log::info('upsert',['contact_null']);
             return true;
         }
         $contact = Arr::get($item, 'key.remoteJid');

@@ -43,12 +43,14 @@ class ChatbotRepository
     }
 
     public function update($chat,$data): \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null {
+        Log::info('chatbotRepo updated init, chat data', [$chat,$data]);
         $message_id = Arr::get($chat, 'message_id') ?? Arr::get($chat, 'referenced_message_id');
         $chatbot = ChatBot::query()->where('message_id', $message_id)->first();
+        Log::info('chatbotRepo updated, chatbot model init', [$chatbot]);
         $chatbot->status = Arr::get($data, 'status')? Arr::get($data, 'status') : $chatbot->status;
         $chatbot->response_message = (Arr::get($data, 'response_message') && trim(Arr::get($data, 'response_message')) !== '') ? Arr::get($data, 'response_message') : $chatbot->response_message;
         $chatbot->save();
-
+        Log::info('chatbotRepo updated, chatbot model finish', [$chatbot]);
         return $chatbot;
     }
 
@@ -105,9 +107,7 @@ class ChatbotRepository
             if($currentChatbot->status == 0){
                 Log::info('getIssetChatMessage is status 0',[true]);
                 $currentChatbot->status = 1;
-            }
-
-            if(isset($message['received_message_text']) && !str_contains($currentChatbot->received_message_text, $message['received_message_text'])){
+            }elseif(isset($message['received_message_text']) && !str_contains(trim($message['received_message_text']), trim($currentChatbot->response_message))){
                 Log::info('getIssetChatMessage not is message bot',[true]);
                 $currentChatbot->status = 1;
             }
@@ -136,6 +136,10 @@ class ChatbotRepository
 
     public function searchProducts($productName, $productModel, $productBrand, $categories, $vendors, $brands, $accountId, $thread, $withAccount = false): \Illuminate\Support\Collection|null
     {
+        $productName = $this->removeConjunctions($productName);
+        $productModel = $this->removeConjunctions($productModel);
+        $productBrand = $this->removeConjunctions($productBrand);
+
         $skipKey = [];
         $inAccount = '_not_in_account';
         if($withAccount){
@@ -163,29 +167,35 @@ class ChatbotRepository
             ->where(function ($query) use ($productName, $productModel, $productBrand){
                 $query->where('notes', 'like', '%' . explode(' ', $productName)[0] . '%');
                 foreach (explode('/', $productName) as $valuePm) {
+                    $valuePm = trim($valuePm);
                     foreach (explode(' ', $valuePm) as $value) {
+                        $value = trim($value);
                         Log::info('consultProduct query product name', [$value]);
-                        $query = $query->where('notes', 'like', '%' . $value . '%');
+                        $query = $query->orWhere('notes', 'like', '%' . $value . '%');
                     }
                 }
                 foreach (explode(' ', $productModel) as $value) {
+                    $value = trim($value);
                     Log::info('consultProduct query product Model', [$value]);
-                    $query = $query->where('notes', 'like', '%' . $value . '%');
+                    $query = $query->orWhere('notes', 'like', '%' . $value . '%');
                     foreach (explode('/', $value) as $val){
-                        $query = $query->where('notes', 'like', '%' . $val . '%');
+                        $val = trim($val);
+                        $query = $query->orWhere('notes', 'like', '%' . $val . '%');
                     }
                     foreach (explode('-', $value) as $val){
-                        $query = $query->where('notes', 'like', '%' . $val . '%');
+                        $val = trim($val);
+                        $query = $query->orWhere('notes', 'like', '%' . $val . '%');
                     }
                 }
                 foreach (explode(' ', $productBrand) as $value) {
+                    $value = trim($value);
                     Log::info('consultProduct query product Brand', [$value]);
-                    $query = $query->where('notes', 'like', '%' . $value . '%');
+                    $query = $query->orWhere('notes', 'like', '%' . $value . '%');
                 }
             })
             ->where(function ($query) use ($categories,$vendors,$brands){
                 if(count($categories) > 0){
-                    $query->whereIn('category_id', $categories);
+                    $query->orWhereIn('category_id', $categories);
                 }
                 if(count($vendors) > 0){
                     $query = $query->orWhereIn('vendor_id', $vendors);
@@ -204,7 +214,9 @@ class ChatbotRepository
             $products = $products->whereNotIn('product_key', $skipKey);
         }
         $products = $products->take(4)->get();
+        Log::info('searchProducts $products', [$products]);
         $skipKey = array_merge($skipKey,$products->pluck('product_key')->toArray());
+        Log::info('searchProducts $skipKey', [$skipKey]);
         Cache::put('skip_key_'.$thread.$inAccount, $skipKey, now()->addMinutes(30));
         return $products;
     }
@@ -277,4 +289,17 @@ class ChatbotRepository
         return $chatBotQuery->get()->groupBy(['instance','contact']);
     }
 
+    protected function removeConjunctions($text): string
+    {
+        $conjunctions = [
+            "de", "para", "con", "y", "o", "pero", "porque", "a", "e", "u", "o", "ni", "sino", "que", "si",
+            "cuando", "como", "donde", "mientras", "aunque", "por", "para", "en", "entre", "hacia", "hasta",
+            "desde", "contra", "según", "sin", "sobre", "tras", "durante", "mediante", "bajo", "ante"
+        ];
+        $words = explode(' ', $text);
+        $filteredWords = array_filter($words, function($word) use ($conjunctions) {
+            return !in_array(mb_strtolower($word), $conjunctions);
+        });
+        return implode(' ', $filteredWords);
+    }
 }

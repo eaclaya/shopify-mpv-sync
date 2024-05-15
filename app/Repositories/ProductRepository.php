@@ -4,6 +4,7 @@ namespace App\Repositories;
 use App\Facades\Shopify;
 use App\Models\Product;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class ProductRepository
 {
@@ -60,6 +61,7 @@ class ProductRepository
             $response = Shopify::post("products", $data);
         }
         if(isset($response['errors'])){
+            Log::info('log errors', [$response['errors']]);
             $errors = Arr::flatten($response['errors']);
             throw new \Exception(implode(', ', $errors));
         }

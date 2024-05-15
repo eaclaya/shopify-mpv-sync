@@ -37,71 +37,79 @@ class ChatbotService
         Log::info('chat bot service lastMessage', [$lastMessage]);
         if(isset($lastMessage)){
             switch ($lastMessage->status){
-            case 0:
-                $response_message = $this->processChat($chat, 0, null);
-                $this->chatbotRepository->update($chat, [
-                    'status' => 2,
-                    'response_message' => $response_message
-                ]);
-                break;
-            case 1:
-            case 3:
-                $this->chatbotRepository->update($chat, [
-                    'status' => 0,
-                ]);
-                break;
-            case 2:
-                Log::info('ultimo status 2', [$chat['received_message_text']]);
-                if($this->removeAccentsAndSymbols($chat['received_message_text']) == 'si'){
-                    $response_message = $this->processChat($chat, 1, null);
-                    $this->chatbotRepository->update($chat, [
-                        'status' => 4,
-                        'response_message' => $response_message
-                    ]);
-                }elseif($this->removeAccentsAndSymbols($chat['received_message_text']) == 'no'){
-                    $response_message = $this->processChat($chat, 2, null);
-                    $this->chatbotRepository->update($chat, [
-                        'status' => 3,
-                        'response_message' => $response_message
-                    ]);
-                }elseif($this->removeAccentsAndSymbols($chat['received_message_text']) == 'finalizar'){
-                    $response_message = $this->processChat($chat, 3, null);
-                    $this->chatbotRepository->update($chat, [
-                        'status' => 3,
-                        'response_message' => $response_message
-                    ]);
-                    if(isset($lastMessage->thread) && trim($lastMessage->thread) !== ""){
-                        $client = OpenAI::client($this->apiKeyOpenIa);
-                        $client->threads()->delete($lastMessage->thread);
-                    }
-                }else{
+                case 0:
                     $response_message = $this->processChat($chat, 0, null);
+                    Log::info('selectAction status 0 $response_message:', [$response_message]);
                     $this->chatbotRepository->update($chat, [
                         'status' => 2,
                         'response_message' => $response_message
                     ]);
-                }
-                break;
-            case 4:
-                if($this->removeAccentsAndSymbols($chat['received_message_text']) == 'finalizar'){
-                    $response_message = $this->processChat($chat, 3, null);
+                    break;
+                case 1:
+                case 3:
+                    Log::info('selectAction status 1 or 3');
                     $this->chatbotRepository->update($chat, [
-                        'status' => 3,
-                        'response_message' => $response_message
+                        'status' => 0,
                     ]);
-                    if(isset($lastMessage->thread) && trim($lastMessage->thread) !== ""){
-                        $client = OpenAI::client($this->apiKeyOpenIa);
-                        $client->threads()->delete($lastMessage->thread);
+                    break;
+                case 2:
+                    Log::info('ultimo status 2', [$chat['received_message_text']]);
+                    if($this->removeAccentsAndSymbols($chat['received_message_text']) == 'si'){
+                        $response_message = $this->processChat($chat, 1, null);
+                        Log::info('selectAction status 2 with receive si $response_message:', [$response_message]);
+                        $this->chatbotRepository->update($chat, [
+                            'status' => 4,
+                            'response_message' => $response_message
+                        ]);
+                    }elseif($this->removeAccentsAndSymbols($chat['received_message_text']) == 'no'){
+                        $response_message = $this->processChat($chat, 2, null);
+                        Log::info('selectAction status 2 with receive no $response_message:', [$response_message]);
+                        $this->chatbotRepository->update($chat, [
+                            'status' => 3,
+                            'response_message' => $response_message
+                        ]);
+                    }elseif($this->removeAccentsAndSymbols($chat['received_message_text']) == 'finalizar'){
+                        $response_message = $this->processChat($chat, 3, null);
+                        Log::info('selectAction status 2 with receive finalizar $response_message:', [$response_message]);
+                        $this->chatbotRepository->update($chat, [
+                            'status' => 3,
+                            'response_message' => $response_message
+                        ]);
+                        if(isset($lastMessage->thread) && trim($lastMessage->thread) !== ""){
+                            $client = OpenAI::client($this->apiKeyOpenIa);
+                            $client->threads()->delete($lastMessage->thread);
+                        }
+                    }else{
+                        $response_message = $this->processChat($chat, 0, null);
+                        Log::info('selectAction status 2 with receive pregunta $response_message:', [$response_message]);
+                        $this->chatbotRepository->update($chat, [
+                            'status' => 2,
+                            'response_message' => $response_message
+                        ]);
                     }
-                }else{
-                    $response_message = $this->processChat($chat, 4, $lastMessage);
-                    $this->chatbotRepository->update($chat, [
-                        'status' => 4,
-                        'response_message' => $response_message
-                    ]);
-                }
-                break;
-        }
+                    break;
+                case 4:
+                    if($this->removeAccentsAndSymbols($chat['received_message_text']) == 'finalizar'){
+                        $response_message = $this->processChat($chat, 3, null);
+                        Log::info('selectAction status 4 with receive finalizar $response_message:', [$response_message]);
+                        $this->chatbotRepository->update($chat, [
+                            'status' => 3,
+                            'response_message' => $response_message
+                        ]);
+                        if(isset($lastMessage->thread) && trim($lastMessage->thread) !== ""){
+                            $client = OpenAI::client($this->apiKeyOpenIa);
+                            $client->threads()->delete($lastMessage->thread);
+                        }
+                    }else{
+                        $response_message = $this->processChat($chat, 4, $lastMessage);
+                        Log::info('selectAction status 4 with receive pregunta $response_message:', [$response_message]);
+                        $this->chatbotRepository->update($chat, [
+                            'status' => 4,
+                            'response_message' => $response_message
+                        ]);
+                    }
+                    break;
+            }
         }else{
             $this->chatbotRepository->update($chat, [
                 'status' => 0,
@@ -303,6 +311,8 @@ class ChatbotService
                 $result .= '*' . trim($product->product_key) . '*, Descripcion: ' . trim($product->description) . ' *Disponible*, Valor aproximado: ' . $product->price . "\n";
             }
             $result .= "\n";
+        }else{
+            $result .= "\n\n" . 'En la tienda ' . $account . ' no tenemos por el momento cantidades disponibles para ese producto' . "\n";
         }
 
         $productsOthers = $this->chatbotRepository->searchProducts($productName, $productModel, $productBrand, $categories, $vendors, $brands, $accountId, $thread, false);
@@ -312,8 +322,11 @@ class ChatbotService
             foreach ($productsOthers as $product) {
                 $result .= 'Codigo: ' . $product->product_key . ', ' . $product->description . ' *Disponible*, Tiene un valor alrededor de: ' . $product->price . "\n";
             }
-            $result .= "\n". "Puedes ir la tienda " . $account . " para asegurar la disponivilidad, recuerda que puedes finalizar la consulta escribiendo la palabra: Finalizar";
+            $result .= "\n". "Puedes ir la tienda " . $account . " para asegurar la disponivilidad";
+        }else{
+            $result .= "\n\n" . 'En otras tiendas por el momento no tenemos disponivilidad' . "\n";
         }
+        $result .= "\n\n" . 'Si deseas puedes a volver a formular la pregunta, para consultar otro producto o solicitar que te sugiera mas productos para que te muestre productos diferentes, recuerda que puedes finalizar la consulta escribiendo la palabra: Finalizar';
         return $result;
     }
 
