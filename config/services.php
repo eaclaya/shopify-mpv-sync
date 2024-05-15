@@ -37,5 +37,9 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'open_ia' => [
+        'api_key' => env('API_KEY_OPEN_IA'),
+        'assistant' => env('ASSISTANTS_ID'),
+    ],
 
 ];
