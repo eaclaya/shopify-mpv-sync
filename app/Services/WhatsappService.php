@@ -30,6 +30,11 @@ class WhatsappService
         $this->chatbotService = $chatbotService;
     }
 
+    public function getConnections(): string
+    {
+        return $this->chatbotRepo->getConnections;
+    }
+
     public function selectAction($input): bool|string
     {
         $instanceId = $input['instance_id'] ?? null;
@@ -62,16 +67,16 @@ class WhatsappService
         if(in_array($message, ['dar_baja','dar_alta'])){
             $phone_search = substr($phone, -8, 8);
             if($message === 'dar_baja'){
-                \DB::connection('mysql_two')->table('clients')
+                \DB::connection($this->getConnections())->table('clients')
                     ->where('phone', 'like', '%' . $phone_search . '%')
                     ->orWhere('work_phone', 'like', '%' . $phone_search . '%')->update(['receive_messages' => 0]);
             }elseif($message === 'dar_alta'){
-                \DB::connection('mysql_two')->table('clients')
+                \DB::connection($this->getConnections())->table('clients')
                     ->where('phone', 'like', '%' . $phone_search . '%')
                     ->orWhere('work_phone', 'like', '%' . $phone_search . '%')->update(['receive_messages' => 1]);
             }
 
-            $client = \DB::connection('mysql_two')->table('clients')->select('id')
+            $client = \DB::connection($this->getConnections())->table('clients')->select('id')
                 ->where('phone', 'like', '%' . $phone_search . '%')
                 ->orWhere('work_phone', 'like', '%' . $phone_search . '%')
                 ->first();

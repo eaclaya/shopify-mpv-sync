@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DaybookApiController;
 use App\Http\Controllers\ProductApiController;
 use App\Http\Controllers\WhatsappApiController;
 use Illuminate\Http\Request;
@@ -21,3 +22,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 Route::get('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
 Route::post('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
+
+Route::post('/daybook', [DaybookApiController::class, 'hook']);

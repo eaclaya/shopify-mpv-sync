@@ -11,7 +11,7 @@ class WhatsappErrors extends Model
 {
     use SoftDeletes;
 
-    protected $connection = 'mysql_two';
+    protected $connection = 'main';
 
     public $timestamps = true;
 

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 
 class ChatbotRepository
 {
+    public string $getConnections = 'main';
+
     public function save($message): ChatBot
     {
         $chatbot = new ChatBot();
@@ -148,7 +150,7 @@ class ChatbotRepository
         if(Cache::has('skip_key_'.$thread.$inAccount)){
             $skipKey = Cache::get('skip_key_'.$thread.$inAccount);
         }
-        $products = DB::connection('mysql_two')
+        $products = DB::connection($this->getConnections)
             ->table('products')
             ->select([
                 'account_id',
@@ -229,7 +231,7 @@ class ChatbotRepository
     }
 
     public function getAccountName($accountId): string|null {
-            return DB::connection('mysql_two')->table('accounts')
+            return DB::connection($this->getConnections)->table('accounts')
                 ->select([
                     'name'
                 ])
@@ -247,7 +249,7 @@ class ChatbotRepository
             }
         }
         $idsModel = [];
-        $model = DB::connection('mysql_two')->table($model)
+        $model = DB::connection($this->getConnections)->table($model)
             ->select([
                 $nameId,'name'
             ]);
@@ -261,7 +263,7 @@ class ChatbotRepository
 
     public function varSystem($model): array|null
     {
-        return DB::connection('mysql_two')->table($model)
+        return DB::connection($this->getConnections)->table($model)
             ->select([
                 'name',
             ])
