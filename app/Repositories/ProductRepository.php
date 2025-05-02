@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Facades\Shopify;
@@ -11,7 +12,7 @@ class ProductRepository
     public function all()
     {
         $host = config('services.shopify.host');
-        return  Product::sync()->get()->map(function($product) use ($host){
+        return  Product::sync()->get()->map(function ($product) use ($host) {
             return [
                 'id' => $product->id,
                 'notes' => $product->notes,
@@ -26,11 +27,13 @@ class ProductRepository
         });
     }
 
-    public function filter($filter){
+    public function filter($filter)
+    {
         return Product::sync()->where('notes', 'like', "%$filter%")->where('product_key', $filter)->get();
     }
 
-    public function update($product){
+    public function update($product)
+    {
         $data = [
             'product' => [
                 'title' => $product['notes'],
@@ -39,28 +42,28 @@ class ProductRepository
                 'status' => 'active',
                 'published' => true,
                 'variants' => [
-                                [
-                                    "option1" => "Default Title",
-                                    "price" => $product['price'],
-                                    "sku" => $product['product_key'],
-                                    "inventory_quantity" => $product['qty']
-                                ]
-                            ],
+                    [
+                        "option1" => "Default Title",
+                        "price" => $product['price'],
+                        "sku" => $product['product_key'],
+                        "inventory_quantity" => $product['qty']
+                    ]
+                ],
                 'images' => [
                     [
                         "src" => $product['picture']
-                        ]
                     ]
+                ]
             ]
         ];
         $response = [];
-        if(isset($product['shopify_product_id'])){
+        if (isset($product['shopify_product_id'])) {
             $data['product']['id'] = $product['shopify_product_id'];
             $response = Shopify::put("products/{$product['shopify_product_id']}", $data);
-        }else{
+        } else {
             $response = Shopify::post("products", $data);
         }
-        if(isset($response['errors'])){
+        if (isset($response['errors'])) {
             Log::info('log errors', [$response['errors']]);
             $errors = Arr::flatten($response['errors']);
             throw new \Exception(implode(', ', $errors));
