@@ -65,6 +65,10 @@ class ProductRepository
         }
         if (isset($response['errors'])) {
             Log::info('log errors', [$response['errors']]);
+            if (!is_array($response['errors'])) {
+                Log::error('Unexpected error format', ['errors' => $response['errors']]);
+                throw new \Exception('Unexpected error format: ' . json_encode($response['errors']));
+            }
             $errors = Arr::flatten($response['errors']);
             throw new \Exception(implode(', ', $errors));
         }
