@@ -43,7 +43,7 @@ class ProductApiController extends Controller
                 $count = 0;
                 foreach ($products as $product) {
                     if ($product['product_key'] && $product['notes'] && $product['price'] && isset($product['qty'])) {
-                        dispatch((new SentApiShopify($product, $this->productRepository))->delay(10 * $count * $level));
+                        dispatch((new SentApiShopify($product, $this->productRepository))->delay(20 * $count * $level));
                         $count++;
                     }
                 }

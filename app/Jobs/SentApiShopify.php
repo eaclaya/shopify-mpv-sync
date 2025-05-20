@@ -3,16 +3,14 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+// use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Carbon\Carbon;
-use DB;
-use Utils;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class SentApiShopify implements ShouldQueue
+class SentApiShopify implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -21,6 +19,13 @@ class SentApiShopify implements ShouldQueue
 
     private $product;
     private $productRepository;
+
+    /**
+     * The time (in seconds) that the lock should be maintained.
+     *
+     * @var int
+     */
+    public $uniqueFor = 60; // 1 hora
 
     /**
      * Create a new job instance.

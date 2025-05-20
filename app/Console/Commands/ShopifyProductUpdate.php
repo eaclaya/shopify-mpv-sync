@@ -14,6 +14,7 @@ class ShopifyProductUpdate extends Command
      * @var string
      */
     protected $signature = 'shopify:products';
+    protected $productRepository;
 
     /**
      * The console command description.
@@ -27,8 +28,8 @@ class ShopifyProductUpdate extends Command
         parent::__construct();
         $this->productRepository = $productRepository;
     }
-    
-    
+
+
     /**
      * Execute the console command.
      *
@@ -37,7 +38,7 @@ class ShopifyProductUpdate extends Command
     public function handle()
     {
         $products = Product::sync()->get();
-        foreach($products as $product){
+        foreach ($products as $product) {
             $this->productRepository->update($product);
         }
     }

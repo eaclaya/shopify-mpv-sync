@@ -9,6 +9,7 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
+    protected $productRepository;
     public function __construct(ProductRepository $productRepository)
     {
         $this->productRepository = $productRepository;
@@ -19,7 +20,8 @@ class ProductController extends Controller
         return view('products.index', compact('products'));
     }
 
-    public function update(Request $request, Product $product){
+    public function update(Request $request, Product $product)
+    {
         $product = $this->productRepository->update($product);
         $request->session()->flash('success', 'Product updated successfully');
         return redirect()->route('products.index');

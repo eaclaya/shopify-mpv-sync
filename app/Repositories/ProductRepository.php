@@ -67,10 +67,10 @@ class ProductRepository
             Log::info('log errors', [$response['errors']]);
             if (!is_array($response['errors'])) {
                 Log::error('Unexpected error format', ['errors' => $response['errors']]);
-                throw new \Exception('Unexpected error format: ' . json_encode($response['errors']));
+                // throw new \Exception('Unexpected error format: ' . json_encode($response['errors']));
             }
             $errors = Arr::flatten($response['errors']);
-            throw new \Exception(implode(', ', $errors));
+            // throw new \Exception(implode(', ', $errors));
         }
         /* if(isset($response['id'])){
             Shopify::post('collects', [
