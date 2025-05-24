@@ -34,6 +34,11 @@ class ProductRepository
 
     public function update($product)
     {
+        if (!isset($product['picture'])) {
+            return;
+        }
+        Log::info('Se Procede a actualizar el Siguiente Producto:', $product['product_key']);
+        Log::info('log product', [$product]);
         $data = [
             'product' => [
                 'title' => $product['notes'],
@@ -63,14 +68,15 @@ class ProductRepository
         } else {
             $response = Shopify::post("products", $data);
         }
+        Log::info('Se termina de actualizar el Siguiente Producto:', $product['product_key']);
+        Log::info('Optuve el siguiente responce:', $response);
         if (isset($response['errors'])) {
-            Log::info('log errors', [$response['errors']]);
             if (!is_array($response['errors'])) {
-                Log::error('Unexpected error format', ['errors' => $response['errors']]);
-                // throw new \Exception('Unexpected error format: ' . json_encode($response['errors']));
+                Log::error('Unexpected error:', ['errors' => $response['errors']]);
+            } else {
+                $errors = json_encode($response['errors']);
+                Log::error('Unexpected error:', ['errors' => $errors]);
             }
-            $errors = Arr::flatten($response['errors']);
-            // throw new \Exception(implode(', ', $errors));
         }
         /* if(isset($response['id'])){
             Shopify::post('collects', [
