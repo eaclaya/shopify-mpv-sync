@@ -37,7 +37,7 @@ class ProductRepository
         if (!isset($product['picture'])) {
             return;
         }
-        Log::info('Se Procede a actualizar el Siguiente Producto:', $product['product_key']);
+        Log::info('Se Procede a actualizar el Siguiente Producto:', [ $product['product_key'] ]);
         Log::info('log product', [$product]);
         $data = [
             'product' => [
@@ -68,8 +68,8 @@ class ProductRepository
         } else {
             $response = Shopify::post("products", $data);
         }
-        Log::info('Se termina de actualizar el Siguiente Producto:', $product['product_key']);
-        Log::info('Optuve el siguiente responce:', $response);
+        Log::info('Se termina de actualizar el Siguiente Producto:', [ $product['product_key'] ]);
+        Log::info('Optuve el siguiente responce:', [ $response ]);
         if (isset($response['errors'])) {
             if (!is_array($response['errors'])) {
                 Log::error('Unexpected error:', ['errors' => $response['errors']]);
