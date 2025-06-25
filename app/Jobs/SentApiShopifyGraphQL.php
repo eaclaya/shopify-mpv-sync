@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Repositories\ProductRepository;
+use App\Repositories\ProductGraphQLRepository;
 use Illuminate\Bus\Queueable;
 // use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class SentApiShopify implements ShouldQueue, ShouldBeUniqueUntilProcessing
+class SentApiShopifyGraphQL implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -42,7 +42,7 @@ class SentApiShopify implements ShouldQueue, ShouldBeUniqueUntilProcessing
      *
      * @return void
      */
-    public function handle(ProductRepository $productRepository)
+    public function handle(ProductGraphQLRepository $productRepository)
     {
         dump('Procedo a mandar mensaje por la api');
         $product = $this->product;

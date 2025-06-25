@@ -31,6 +31,7 @@ return [
         'access_token' => env('SHOPIFY_ACCESS_TOKEN'),
         'version' => env('SHOPIFY_VERSION'),
         'collection_id' => env('SHOPIFY_COLLECTION_ID'),
+        'location_id' => env('SHOPIFY_LOCATION_ID'),
     ],
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),

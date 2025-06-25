@@ -5,8 +5,8 @@ namespace App\Providers;
 use App\Repositories\ChatbotRepository;
 use App\Services\ShopifyService;
 use App\Services\ChatbotService;
+use App\Services\ShopifyGraphQLService;
 use App\Services\WhatsappService;
-
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,15 +23,21 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->make(ShopifyService::class)
             );
         });
-        $this->app->singleton('Chatbot', function () {
-            return new ChatbotService();
+        //ShopifyGraphQL
+        $this->app->singleton('ShopifyGraphQL', function () {
+            return new ShopifyGraphQLService(
+                $this->app->make(ShopifyGraphQLService::class)
+            );
         });
-        $this->app->singleton('Whatsapp', function () {
-            return new WhatsappService();
-        });
-        $this->app->singleton(ChatbotRepository::class, function () {
-            return new ChatbotRepository();
-        });
+        // $this->app->singleton('Chatbot', function () {
+        //     return new ChatbotService();
+        // });
+        // $this->app->singleton('Whatsapp', function () {
+        //     return new WhatsappService();
+        // });
+        // $this->app->singleton(ChatbotRepository::class, function () {
+        //     return new ChatbotRepository();
+        // });
     }
 
     /**

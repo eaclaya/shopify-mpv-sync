@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Facades\Shopify;
 use App\Models\Product;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 class ProductRepository
