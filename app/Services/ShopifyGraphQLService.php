@@ -125,10 +125,6 @@ class ShopifyGraphQLService
         $mutation = '
             mutation inventorySetOnHandQuantities($input: InventorySetOnHandQuantitiesInput!) {
                 inventorySetOnHandQuantities(input: $input) {
-                    inventoryLevels {
-                        id
-                        available
-                    }
                     userErrors {
                         field
                         message

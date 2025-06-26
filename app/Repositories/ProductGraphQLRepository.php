@@ -59,10 +59,10 @@ class ProductGraphQLRepository
                 $body,
             );
 
-            $updateImageResponse = ShopifyGraphQL::replaceProductImage(
-                $productGlobalId,
-                $imageUrl
-            );
+            // $updateImageResponse = ShopifyGraphQL::replaceProductImage(
+            //     $productGlobalId,
+            //     $imageUrl
+            // );
 
             $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
 
@@ -85,7 +85,7 @@ class ProductGraphQLRepository
                 'product_key' => $product['product_key'],
                 'response' => [
                     'product' => $updateProductResponse,
-                    'image' => $updateImageResponse,
+                    // 'image' => $updateImageResponse,
                     'inventory' => $updateInventoryResponse,
                 ]
             ]);
