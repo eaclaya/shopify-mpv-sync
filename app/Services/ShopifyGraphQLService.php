@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ShopifyGraphQLService
 {
@@ -133,14 +134,18 @@ class ShopifyGraphQLService
             }
         ';
 
-        $variables = [
-            'input' => [
-                'setQuantities' => [
-                    [
+        $dataSerQuantities = [
                         'inventoryItemId' => $inventoryItemId,
                         'locationId' => $locationGlobalId,
                         'quantity' => $newQuantity
-                    ]
+                    ];
+
+        Log::info('Se Procede a actualizar la cantidad de productos en el inventario para la variante:', [$dataSerQuantities]);
+
+        $variables = [
+            'input' => [
+                'setQuantities' => [
+                    $dataSerQuantities
                 ]
             ]
         ];
