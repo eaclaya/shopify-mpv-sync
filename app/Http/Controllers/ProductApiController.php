@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SentApiShopify;
+use App\Jobs\SentApiShopifyGraphQL;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
 
@@ -65,7 +66,7 @@ class ProductApiController extends Controller
                 $count = 0;
                 foreach ($products as $product) {
                     if ($product['product_key'] && $product['notes'] && $product['price'] && isset($product['qty'])) {
-                        dispatch((new SentApiShopify($product, $this->productRepository))->delay(20 * $count * $level));
+                        dispatch((new SentApiShopifyGraphQL($product))->delay(20 * $count * $level));
                         $count++;
                     }
                 }
