@@ -146,11 +146,11 @@ class ShopifyGraphQLService
         ]);
 
         $variables = [
-            'input' => [
-                'setQuantities' => [
+            'input' => //[
+                // 'setQuantities' => [
                     $dataSerQuantities
-                ]
-            ]
+                // ]
+            // ]
         ];
 
         return $this->query($mutation, $variables);
