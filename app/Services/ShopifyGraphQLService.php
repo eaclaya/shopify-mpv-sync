@@ -130,6 +130,14 @@ class ShopifyGraphQLService
                         field
                         message
                     }
+                    inventoryAdjustmentGroup {
+                        createdAt
+                        reason
+                        changes {
+                            name
+                            delta
+                        }
+                    }
                 }
             }
         ';
@@ -138,7 +146,6 @@ class ShopifyGraphQLService
             'inventoryItemId' => $inventoryItemId,
             'locationId' => $locationGlobalId,
             'quantity' => $newQuantity,
-            'reason' => 'CORRECTION'
         ];
 
         Log::info('Se Procede a actualizar la cantidad de productos en el inventario para la variante:', [
