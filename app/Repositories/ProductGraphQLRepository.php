@@ -53,7 +53,7 @@ class ProductGraphQLRepository
             $productGlobalId = $product['shopify_product_id'];
             $productGlobalId = ShopifyGraphQL::toGlobalId('Product', $productGlobalId);
 
-            $updateProductResponse = ShopifyGraphQL::updateProductTitleAndBodyAndImage(
+            $updateProductResponse = ShopifyGraphQL::updateProductTitleAndBody(
                 $productGlobalId,
                 $title,
                 $body,
