@@ -50,12 +50,17 @@ class ProductGraphQLRepository
             $title = $product['notes'];
             $body = '<p>' . e($product['notes']) . '</p>';
             $imageUrl = $product['picture'];
-            $productGlobalId = $product['shopify_product_id']; // ya viene en formato gid
+            $productGlobalId = $product['shopify_product_id'];
+            $productGlobalId = ShopifyGraphQL::toGlobalId('Product', $productGlobalId);
 
             $updateProductResponse = ShopifyGraphQL::updateProductTitleAndBodyAndImage(
                 $productGlobalId,
                 $title,
                 $body,
+            );
+
+            $updateImageResponse = ShopifyGraphQL::replaceProductImage(
+                $productGlobalId,
                 $imageUrl
             );
 
@@ -80,6 +85,7 @@ class ProductGraphQLRepository
                 'product_key' => $product['product_key'],
                 'response' => [
                     'product' => $updateProductResponse,
+                    'image' => $updateImageResponse,
                     'inventory' => $updateInventoryResponse,
                 ]
             ]);

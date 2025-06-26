@@ -123,19 +123,11 @@ class ShopifyGraphQLService
         }
 
         $mutation = '
-            mutation InventorySetQuantities($input: InventorySetQuantitiesInput!) {
-                inventorySetQuantities(input: $input) {
+            mutation inventorySetOnHandQuantities($input: InventorySetOnHandQuantitiesInput!) {
+                inventorySetOnHandQuantities(input: $input) {
                     inventoryLevels {
                         id
                         available
-                        item {
-                            id
-                            sku
-                        }
-                        location {
-                            id
-                            name
-                        }
                     }
                     userErrors {
                         field
@@ -147,12 +139,11 @@ class ShopifyGraphQLService
 
         $variables = [
             'input' => [
-                'setQuantities' => [
+                'inventoryItemAdjustments' => [
                     [
                         'inventoryItemId' => $inventoryItemId,
                         'locationId' => $locationGlobalId,
-                        'quantity' => $newQuantity,
-                        'setOnHand' => true,
+                        'availableQuantity' => $newQuantity
                     ]
                 ]
             ]
@@ -161,7 +152,7 @@ class ShopifyGraphQLService
         return $this->query($mutation, $variables);
     }
 
-    public function updateProductTitleAndBodyAndImage(string $productId, string $title, string $bodyHtml, string $imageUrl): array
+    public function updateProductTitleAndBody(string $productId, string $title, string $bodyHtml, string $imageUrl): array
     {
         $mutation = '
             mutation productUpdate($input: ProductInput!) {
@@ -170,13 +161,6 @@ class ShopifyGraphQLService
                         id
                         title
                         bodyHtml
-                        images(first: 1) {
-                            edges {
-                                node {
-                                    originalSrc
-                                }
-                            }
-                        }
                     }
                     userErrors {
                         field
@@ -191,13 +175,65 @@ class ShopifyGraphQLService
                 'id' => $productId,
                 'title' => $title,
                 'bodyHtml' => $bodyHtml,
-                'images' => [
-                    ['src' => $imageUrl]
-                ],
             ]
         ];
 
         return $this->mutation($mutation, $variables);
     }
 
+    public function replaceProductImage(string $productId, string $newImageUrl): array
+    {
+        $query = '
+            query getProductImages($productId: ID!) {
+                product(id: $productId) {
+                    images(first: 1) {
+                        edges {
+                            node {
+                                id
+                                originalSrc
+                            }
+                        }
+                    }
+                }
+            }
+        ';
+        $result = $this->query($query, ['productId' => $productId]);
+
+        $existingImage = $result['data']['product']['images']['edges'][0]['node'] ?? null;
+
+        if ($existingImage) {
+            $deleteMutation = '
+                mutation productImageDelete($id: ID!) {
+                    productImageDelete(id: $id) {
+                        deletedImageId
+                        userErrors {
+                            field
+                            message
+                        }
+                    }
+                }
+            ';
+            $this->mutation($deleteMutation, ['id' => $existingImage['id']]);
+        }
+
+        $createMutation = '
+            mutation productImageCreate($productId: ID!, $src: String!) {
+                productImageCreate(productId: $productId, image: {src: $src}) {
+                    image {
+                        id
+                        originalSrc
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+
+        return $this->mutation($createMutation, [
+            'productId' => $productId,
+            'src' => $newImageUrl,
+        ]);
+    }
 }
