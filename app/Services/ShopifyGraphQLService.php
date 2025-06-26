@@ -154,7 +154,7 @@ class ShopifyGraphQLService
 
         $variables = [
             'input' => [
-                'reason' => 'CORRECTION',
+                'reason' => 'correction',
                 'setQuantities' => [
                     $dataSerQuantities
                 ]
