@@ -135,10 +135,11 @@ class ShopifyGraphQLService
         ';
 
         $dataSerQuantities = [
-                        'inventoryItemId' => $inventoryItemId,
-                        'locationId' => $locationGlobalId,
-                        'quantity' => $newQuantity
-                    ];
+            'inventoryItemId' => $inventoryItemId,
+            'locationId' => $locationGlobalId,
+            'quantity' => $newQuantity,
+            'reason' => 'CORRECTION'
+        ];
 
         Log::info('Se Procede a actualizar la cantidad de productos en el inventario para la variante:', [
             $dataSerQuantities
