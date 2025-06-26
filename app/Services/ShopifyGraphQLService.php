@@ -152,7 +152,7 @@ class ShopifyGraphQLService
         return $this->query($mutation, $variables);
     }
 
-    public function updateProductTitleAndBody(string $productId, string $title, string $bodyHtml, string $imageUrl): array
+    public function updateProductTitleAndBody(string $productId, string $title, string $bodyHtml): array
     {
         $mutation = '
             mutation productUpdate($input: ProductInput!) {
