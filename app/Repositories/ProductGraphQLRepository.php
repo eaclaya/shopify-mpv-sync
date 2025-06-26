@@ -69,10 +69,9 @@ class ProductGraphQLRepository
             $locationNumericId = ShopifyGraphQL::getLocationGlobalId($this->locationId);
 
             Log::info('tengo la siguiente variante: ', [$variantId]);
-            $variantNumericId = ShopifyGraphQL::getProductVariantGlobalId($variantId);
 
             $updateInventoryResponse = ShopifyGraphQL::updateInventoryByVariant(
-                $variantNumericId,
+                $variantId,
                 $locationNumericId,
                 $product['qty']
             );
