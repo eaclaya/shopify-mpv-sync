@@ -52,7 +52,7 @@ class ShopifyGraphQLService
         ];
     }
 
-    protected function toGlobalId(string $resourceName, int $id): string
+    public function toGlobalId(string $resourceName, int $id): string
     {
         return "gid://shopify/{$resourceName}/{$id}";
     }
