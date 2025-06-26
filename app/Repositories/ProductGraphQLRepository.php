@@ -46,23 +46,21 @@ class ProductGraphQLRepository
         Log::info('Se Procede a actualizar el Siguiente Producto:', [$product['product_key']]);
 
         try {
-            // Paso 1: Actualizar título, body, imagen
             $title = $product['notes'];
-            $body = '<p>' . e($product['notes']) . '</p>';
             $imageUrl = $product['picture'];
             $productGlobalId = $product['shopify_product_id'];
             $productGlobalId = ShopifyGraphQL::toGlobalId('Product', $productGlobalId);
 
             $updateProductResponse = ShopifyGraphQL::updateProductTitleAndBody(
                 $productGlobalId,
-                $title,
-                $body,
+                $title
             );
 
-            // $updateImageResponse = ShopifyGraphQL::replaceProductImage(
-            //     $productGlobalId,
-            //     $imageUrl
-            // );
+            $updateImageResponse = ShopifyGraphQL::replaceProductImage(
+                $productGlobalId,
+                $imageUrl,
+                $title,
+            );
 
             $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
 
@@ -85,7 +83,7 @@ class ProductGraphQLRepository
                 'product_key' => $product['product_key'],
                 'response' => [
                     'product' => $updateProductResponse,
-                    // 'image' => $updateImageResponse,
+                    'image' => $updateImageResponse,
                     'inventory' => $updateInventoryResponse,
                 ]
             ]);

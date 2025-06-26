@@ -164,7 +164,7 @@ class ShopifyGraphQLService
         return $this->query($mutation, $variables);
     }
 
-    public function updateProductTitleAndBody(string $productId, string $title, string $bodyHtml): array
+    public function updateProductTitleAndBody(string $productId, string $title): array
     {
         $mutation = '
             mutation productUpdate($input: ProductInput!) {
@@ -172,7 +172,6 @@ class ShopifyGraphQLService
                     product {
                         id
                         title
-                        bodyHtml
                     }
                     userErrors {
                         field
@@ -186,24 +185,33 @@ class ShopifyGraphQLService
             'input' => [
                 'id' => $productId,
                 'title' => $title,
-                'bodyHtml' => $bodyHtml,
             ]
         ];
 
         return $this->mutation($mutation, $variables);
     }
 
-    public function replaceProductImage(string $productId, string $newImageUrl): array
+    public function replaceProductImage(string $productId, string $newImageUrl, string $title): array
     {
         $query = '
-            query getProductImages($productId: ID!) {
+            query ProductImageList($productId: ID!) {
                 product(id: $productId) {
-                    images(first: 1) {
-                        edges {
-                            node {
-                                id
-                                originalSrc
+                    media(first: 10, query: "media_type:IMAGE", sortKey: POSITION) {
+                        nodes {
+                            id
+                            alt
+                            ... on MediaImage {
+                                createdAt
+                                image {
+                                    width
+                                    height
+                                    url
+                                }
                             }
+                        }
+                        pageInfo {
+                            startCursor
+                            endCursor
                         }
                     }
                 }
@@ -211,33 +219,52 @@ class ShopifyGraphQLService
         ';
         $result = $this->query($query, ['productId' => $productId]);
 
-        $existingImage = $result['data']['product']['images']['edges'][0]['node'] ?? null;
-
+        $existingImage = $result['data']['product']['media']['nodes'][0] ?? null;
         if ($existingImage) {
             $deleteMutation = '
-                mutation productImageDelete($id: ID!) {
-                    productImageDelete(id: $id) {
-                        deletedImageId
-                        userErrors {
+                mutation productDeleteMedia($mediaIds: [ID!]!, $productId: ID!) {
+                    productDeleteMedia(mediaIds: $mediaIds, productId: $productId) {
+                        deletedMediaIds
+                        deletedProductImageIds
+                        mediaUserErrors {
                             field
                             message
+                        }
+                        product {
+                            id
+                            title
+                            media(first: 10) {
+                                nodes {
+                                    alt
+                                    mediaContentType
+                                    status
+                                }
+                            }
                         }
                     }
                 }
             ';
-            $this->mutation($deleteMutation, ['id' => $existingImage['id']]);
+            $this->mutation($deleteMutation, [
+                'mediaIds' => [ $existingImage['id'] ],
+                'productId' => $productId
+            ]);
         }
 
         $createMutation = '
-            mutation productImageCreate($productId: ID!, $src: String!) {
-                productImageCreate(productId: $productId, image: {src: $src}) {
-                    image {
-                        id
-                        originalSrc
+            mutation productCreateMedia($media: [CreateMediaInput!]!, $productId: ID!) {
+                productCreateMedia(media: $media, productId: $productId) {
+                    media {
+                        alt
+                        mediaContentType
+                        status
                     }
-                    userErrors {
+                    mediaUserErrors {
                         field
                         message
+                    }
+                    product {
+                        id
+                        title
                     }
                 }
             }
@@ -245,7 +272,14 @@ class ShopifyGraphQLService
 
         return $this->mutation($createMutation, [
             'productId' => $productId,
-            'src' => $newImageUrl,
+            'media' => [
+                [
+                    'alt' => $title,
+                    'mediaContentType' => 'IMAGE',
+                    'originalSource' => $newImageUrl
+                ]
+            ],
         ]);
     }
+
 }
