@@ -97,10 +97,8 @@ class ShopifyGraphQLService
         ] : null;
     }
 
-    public function updateInventoryByVariant(string $variantId, string $locationId, int $newQuantity): array
+    public function updateInventoryByVariant(string $productVariantGlobalId, string $locationGlobalId, int $newQuantity): array
     {
-        $productVariantGlobalId = $this->getProductVariantGlobalId($variantId);
-        $locationGlobalId = $this->getLocationGlobalId($locationId);
         $queryGetInventoryItem = '
             query GetInventoryItemByVariant($id: ID!) {
                 node(id: $id) {
