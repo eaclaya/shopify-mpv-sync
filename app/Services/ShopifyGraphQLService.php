@@ -140,7 +140,9 @@ class ShopifyGraphQLService
                         'quantity' => $newQuantity
                     ];
 
-        Log::info('Se Procede a actualizar la cantidad de productos en el inventario para la variante:', [$dataSerQuantities]);
+        Log::info('Se Procede a actualizar la cantidad de productos en el inventario para la variante:', [
+            $dataSerQuantities
+        ]);
 
         $variables = [
             'input' => [
