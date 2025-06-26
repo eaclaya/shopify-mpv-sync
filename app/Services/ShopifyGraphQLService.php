@@ -135,7 +135,7 @@ class ShopifyGraphQLService
 
         $variables = [
             'input' => [
-                'inventoryItemAdjustments' => [
+                'setQuantities' => [
                     [
                         'inventoryItemId' => $inventoryItemId,
                         'locationId' => $locationGlobalId,
