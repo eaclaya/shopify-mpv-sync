@@ -139,7 +139,7 @@ class ShopifyGraphQLService
                     [
                         'inventoryItemId' => $inventoryItemId,
                         'locationId' => $locationGlobalId,
-                        'availableQuantity' => $newQuantity
+                        'quantity' => $newQuantity
                     ]
                 ]
             ]
