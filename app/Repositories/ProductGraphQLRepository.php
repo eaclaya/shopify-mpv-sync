@@ -40,7 +40,7 @@ class ProductGraphQLRepository
     public function update($product)
     {
         if (!isset($product['picture']) || !isset($product['shopify_product_id'])) {
-            Log::error('Producto no tiene imagen o ID de producto de Shopify:', [$product['product_key']]);
+            Log::error('Producto no tiene imagen o ID de producto de Shopify:', [$product]);
             return;
         }
 
