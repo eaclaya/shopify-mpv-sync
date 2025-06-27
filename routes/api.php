@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/products', [ProductApiController::class, 'store']);
-    Route::post('/products/update', [ProductApiController::class, 'update']);
-    Route::post('/products/update/graph_ql', [ProductApiController::class, 'updateGraphQl']);
+    Route::post('/products/update', [ProductApiController::class, 'updateGraphQl']);
+    // Route::post('/products/update/graph_ql', [ProductApiController::class, 'updateGraphQl']);
 });
 Route::get('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
 Route::post('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);

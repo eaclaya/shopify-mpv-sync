@@ -24,7 +24,7 @@ class ProductApiController extends Controller
         if (is_array($data)) {
             try {
                 $product = $data;
-                if ($product['product_key'] && $product['notes'] && $product['price'] && isset($product['qty'])) {
+                if ($product['product_key'] && $product['notes'] && $product['price']) {
                     $result = $this->productRepository->update($product);
                 }
             } catch (\Exception $e) {

@@ -308,4 +308,51 @@ class ShopifyGraphQLService
             ],
         ]);
     }
+
+    public function createProductWithVariant(array $product): array
+    {
+        $mutation = '
+            mutation productCreate($input: ProductCreateInput!) {
+                productCreate(input: $input) {
+                    product {
+                        id
+                        title
+                        handle
+                        status
+                        createdAt
+                        variants(first: 1) {
+                            edges {
+                                node {
+                                    id
+                                    price
+                                    sku
+                                }
+                            }
+                        }
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+
+        $variables = [
+            'input' => [
+                'title' => $product['notes'],
+                'descriptionHtml' => '<p>'.$product['notes'].'</p>',
+                'vendor' => 'KM Motos',
+                'status' => 'ACTIVE',
+                'published' => true,
+                'variants' => [[
+                    'price' => number_format($product['price'], 2, '.', ''),
+                    'sku' => $product['product_key'],
+                    "inventoryQuantity" => $product['qty']
+                ]],
+            ]
+        ];
+
+        return $this->mutation($mutation, $variables);
+    }
 }
