@@ -6,6 +6,7 @@ use App\Jobs\SentApiShopify;
 use App\Jobs\SentApiShopifyGraphQL;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProductApiController extends Controller
 {
@@ -43,7 +44,7 @@ class ProductApiController extends Controller
                 $level = isset($data['level']) ? $data['level'] : 1;
                 $count = 0;
                 foreach ($products as $product) {
-                    if ($product['product_key'] && $product['notes'] && $product['price'] && isset($product['qty'])) {
+                    if ($product['product_key'] && $product['notes'] && $product['price']) {
                         dispatch((new SentApiShopify($product))->delay(20 * $count * $level));
                         $count++;
                     }
@@ -65,7 +66,9 @@ class ProductApiController extends Controller
                 $level = isset($data['level']) ? $data['level'] : 1;
                 $count = 0;
                 foreach ($products as $product) {
+                    Log::info('Entro en el array con el producto: ', [$product['product_key']]);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
+                        Log::info('pase el check y paso a procesar el producto en un queue: ', [$product['product_key']]);
                         dispatch((new SentApiShopifyGraphQL($product))->delay(20 * $count * $level));
                         $count++;
                     }
