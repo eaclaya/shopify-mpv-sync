@@ -72,7 +72,7 @@ class ShopifyGraphQLService
     {
         $query = '
             query getProductBySku($sku: String!) {
-                productVariants(first: 1, query: $sku) {
+                productVariants(first: 10, query: $sku) {
                     edges {
                         node {
                             id

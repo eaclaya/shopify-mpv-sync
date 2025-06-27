@@ -68,6 +68,7 @@ class ProductGraphQLRepository
 
             if (!$variantInfo) {
                 throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
+                return;
             }
 
             $variantId = $variantInfo['variantId'];
