@@ -49,6 +49,7 @@ class ProductGraphQLRepository
         try {
             $title = $product['notes'];
             $imageUrl = $product['picture'];
+            $price = $product['price'];
             $productGlobalId = $product['shopify_product_id'];
             $productGlobalId = ShopifyGraphQL::toGlobalId('Product', $productGlobalId);
 
@@ -80,12 +81,18 @@ class ProductGraphQLRepository
                 $product['qty']
             );
 
+            $updatePriceResponse = ShopifyGraphQL::updatePriceByVariant(
+                $variantId,
+                $price,
+            );
+
             Log::info('Producto actualizado correctamente:', [
                 'product_key' => $product['product_key'],
                 'response' => [
                     'product' => $updateProductResponse,
                     'image' => $updateImageResponse,
                     'inventory' => $updateInventoryResponse,
+                    'price' => $updatePriceResponse
                 ]
             ]);
 

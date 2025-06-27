@@ -164,6 +164,33 @@ class ShopifyGraphQLService
         return $this->query($mutation, $variables);
     }
 
+    public function updatePriceByVariant(string $productVariantGlobalId, int $newPrice): array
+    {
+        $mutation = '
+            mutation productVariantUpdate($input: ProductVariantInput!) {
+                productVariantUpdate(input: $input) {
+                    productVariant {
+                        id
+                        price
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+
+        $variables = [
+            'input' => [
+                'id' => $productVariantGlobalId,
+                'price' => number_format($newPrice, 2, '.', ''),
+            ]
+        ];
+
+        return $this->query($mutation, $variables);
+    }
+
     public function updateProductTitleAndBody(string $productId, string $title): array
     {
         $mutation = '
@@ -281,5 +308,4 @@ class ShopifyGraphQLService
             ],
         ]);
     }
-
 }
