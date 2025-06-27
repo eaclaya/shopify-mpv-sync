@@ -63,13 +63,17 @@ class ProductApiController extends Controller
         try {
             if (is_array($data)) {
                 $products = $data['products'];
-                $level = isset($data['level']) ? $data['level'] : 1;
-                $count = 0;
+                $level = isset($data['level']) ? $data['level'] : 0;
+                $count = 1;
+                $time = 60;
+                $rowsQty = 25;
+
                 foreach ($products as $product) {
                     Log::info('Entro en el array con el producto: ', [$product]);
+                    $delay = $time * $count + ($level * $rowsQty * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
                         Log::info('pase el check y paso a procesar el producto en un queue: ', [$product]);
-                        dispatch((new SentApiShopifyGraphQL($product))->delay(20 * $count * $level));
+                        dispatch((new SentApiShopifyGraphQL($product))->delay($delay));
                         $count++;
                     }
                 }
