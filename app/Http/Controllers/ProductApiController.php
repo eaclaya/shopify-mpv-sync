@@ -65,7 +65,7 @@ class ProductApiController extends Controller
                 $level = isset($data['level']) ? $data['level'] : 1;
                 $count = 0;
                 foreach ($products as $product) {
-                    if ($product['product_key'] && $product['notes'] && $product['price'] && isset($product['qty'])) {
+                    if ($product['product_key'] && $product['notes'] && $product['price']) {
                         dispatch((new SentApiShopifyGraphQL($product))->delay(20 * $count * $level));
                         $count++;
                     }
