@@ -65,11 +65,10 @@ class ProductApiController extends Controller
                 $products = $data['products'];
                 $level = isset($data['level']) ? $data['level'] : 0;
                 $count = 1;
-                $time = 60;
+                $time = 90;
                 $rowsQty = 25;
 
                 foreach ($products as $product) {
-                    Log::info('Entro en el array con el producto: ', [$product]);
                     $delay = $time * $count + ($level * $rowsQty * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
                         Log::info('pase el check y paso a procesar el producto en un queue: ', [$product]);
