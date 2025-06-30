@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Facades\ShopifyGraphQL;
 use App\Models\Product;
+use Exception;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ProductGraphQLRepository
@@ -58,11 +60,27 @@ class ProductGraphQLRepository
                 $title
             );
 
-            $updateImageResponse = ShopifyGraphQL::replaceProductImage(
-                $productGlobalId,
-                $imageUrl,
-                $title,
-            );
+            if (!isset($imageUrl) || trim($imageUrl) === '') {
+                $updateImageResponse = 'No se puede actualizar la imagen del producto porque no se proporcionó una URL válida.';
+            } else {
+                $isOk = false;
+                try {
+                    $response = Http::get($imageUrl);
+                    $isOk = $response->ok();
+                } catch (Exception $e) {
+                    $isOk = false;
+                }
+
+                if (!$isOk) {
+                    $updateImageResponse = 'No se puede actualizar la imagen del producto porque la URL no es válida.';
+                } else {
+                    $updateImageResponse = ShopifyGraphQL::replaceProductImage(
+                        $productGlobalId,
+                        $imageUrl,
+                        $title,
+                    );
+                }
+            }
 
             $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
 
