@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ShopifyApiController;
 use App\Http\Controllers\SupabaseApiController;
-use App\Http\Controllers\WhatsappApiController;
+// use App\Http\Controllers\WhatsappApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
