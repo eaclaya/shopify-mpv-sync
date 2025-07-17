@@ -24,23 +24,32 @@ class ShopifyApiController extends Controller
         if (is_array($data)) {
             try {
                 $product = $data;
+                Log::info('E recibido el siguiente producto: ', $product);
                 if ($product['product_key'] && $product['notes'] && $product['price']) {
+                    Log::info('pase la prueba con el producto: ', $product);
                     if (!isset($product['shopify_product_id'])) {
+                        Log::info('no tenia shopify_product_id y prosigo a crearlo: ', $product);
                         $result = $this->productRepository->create($product);
+                        Log::info('cree el shopify_product_id: ', $result);
                     } else {
+                        Log::info('si tenia el shopify_product_id: ', $result);
                         $result = $product;
                     }
                     if (isset($result['shopify_product_id'])) {
+                        Log::info('paso a actualizar el producto: ', $result);
                         dispatch((new SentApiShopifyGraphQL($result))->delay(15));
                     }
                 }
             } catch (\Exception $e) {
+                Log::error("ShopifyApi Service Error: " . $e->getMessage());
                 return response()->json(['error' => 'Error fetching products: ' . $e->getMessage()], 500);
             }
         } else {
+            Log::error("ShopifyApi Service Error: Data no es Array");
             return response()->json(['error' => 'Error fetching products: Data no es Array'], 500);
         }
-        return response()->json($result);
+        Log::info("retorno el resultado: ", $result);
+        return response()->json(['product' => $result], 200);
     }
 
     public function update(Request $request)
