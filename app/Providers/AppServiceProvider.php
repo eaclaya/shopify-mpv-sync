@@ -2,11 +2,12 @@
 
 namespace App\Providers;
 
-use App\Repositories\ChatbotRepository;
+// use App\Repositories\ChatbotRepository;
+// use App\Services\ChatbotService;
+// use App\Services\WhatsappService;
 use App\Services\ShopifyService;
-use App\Services\ChatbotService;
 use App\Services\ShopifyGraphQLService;
-use App\Services\WhatsappService;
+use App\Services\SupabaseService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +28,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('ShopifyGraphQL', function () {
             return new ShopifyGraphQLService(
                 $this->app->make(ShopifyGraphQLService::class)
+            );
+        });
+        //Supabase
+        $this->app->singleton('Supabase', function () {
+            return new SupabaseService(
+                $this->app->make(SupabaseService::class)
             );
         });
         // $this->app->singleton('Chatbot', function () {

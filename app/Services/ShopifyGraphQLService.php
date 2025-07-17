@@ -317,15 +317,17 @@ class ShopifyGraphQLService
                     product {
                         id
                         title
-                        handle
+                        vendor
                         status
-                        createdAt
+                        published
                         variants(first: 1) {
-                            edges {
-                                node {
+                            node {
+                                id
+                                price
+                                sku
+                                inventoryItem {
                                     id
-                                    price
-                                    sku
+                                    tracked
                                 }
                             }
                         }
@@ -341,14 +343,12 @@ class ShopifyGraphQLService
         $variables = [
             'input' => [
                 'title' => $product['notes'],
-                'descriptionHtml' => '<p>'.$product['notes'].'</p>',
                 'vendor' => 'KM Motos',
                 'status' => 'ACTIVE',
                 'published' => true,
                 'variants' => [[
                     'price' => number_format($product['price'], 2, '.', ''),
                     'sku' => $product['product_key'],
-                    "inventoryQuantity" => $product['qty']
                 ]],
             ]
         ];

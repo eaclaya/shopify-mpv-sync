@@ -2,11 +2,11 @@
 
 namespace App\Facades;
 
-class Shopify
+class Supabase
 {
     protected static function resolveFacade($name)
     {
-        return app('Shopify');
+        return app('Supabase');
     }
     public static function __callStatic($name, $arguments)
     {

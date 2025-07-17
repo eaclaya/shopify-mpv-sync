@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SentApiShopify;
 use App\Jobs\SentApiShopifyGraphQL;
-use App\Repositories\ProductRepository;
+use App\Repositories\ProductGraphQLRepository;
+// use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class ProductApiController extends Controller
+class ShopifyApiController extends Controller
 {
     protected $productRepository;
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductGraphQLRepository $productRepository)
     {
         $this->productRepository = $productRepository;
     }
@@ -25,38 +25,25 @@ class ProductApiController extends Controller
             try {
                 $product = $data;
                 if ($product['product_key'] && $product['notes'] && $product['price']) {
-                    $result = $this->productRepository->update($product);
+                    if (!isset($product['shopify_product_id'])) {
+                        $result = $this->productRepository->create($product);
+                    } else {
+                        $result = $product;
+                    }
+                    if (isset($result['shopify_product_id'])) {
+                        dispatch((new SentApiShopifyGraphQL($result))->delay(15));
+                    }
                 }
             } catch (\Exception $e) {
                 return response()->json(['error' => 'Error fetching products: ' . $e->getMessage()], 500);
             }
+        } else {
+            return response()->json(['error' => 'Error fetching products: Data no es Array'], 500);
         }
         return response()->json($result);
     }
 
     public function update(Request $request)
-    {
-        $data = $request->all();
-
-        try {
-            if (is_array($data)) {
-                $products = $data['products'];
-                $level = isset($data['level']) ? $data['level'] : 1;
-                $count = 0;
-                foreach ($products as $product) {
-                    if ($product['product_key'] && $product['notes'] && $product['price']) {
-                        dispatch((new SentApiShopify($product))->delay(20 * $count * $level));
-                        $count++;
-                    }
-                }
-                return response()->json(['success' => 'Products have been updated successfully'], 200);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching products: ' . $e->getMessage()], 500);
-        }
-    }
-
-    public function updateGraphQl(Request $request)
     {
         $data = $request->all();
 
@@ -78,8 +65,10 @@ class ProductApiController extends Controller
                 }
                 return response()->json(['success' => 'Products have been updated successfully'], 200);
             }
+            return response()->json(['error' => 'Error fetching products'], 500);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error fetching products: ' . $e->getMessage()], 500);
         }
     }
+
 }

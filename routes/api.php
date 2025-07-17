@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProductApiController;
+use App\Http\Controllers\ShopifyApiController;
+use App\Http\Controllers\SupabaseApiController;
 use App\Http\Controllers\WhatsappApiController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,9 +17,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::post('/products', [ProductApiController::class, 'store']);
-    Route::post('/products/update', [ProductApiController::class, 'updateGraphQl']);
-    // Route::post('/products/update/graph_ql', [ProductApiController::class, 'updateGraphQl']);
+    Route::post('/shopify/products', [ShopifyApiController::class, 'store']);
+    Route::post('/shopify/products/update', [ShopifyApiController::class, 'update']);
+
+    Route::post('/supabase/', [SupabaseApiController::class, 'store']);
+    Route::post('/supabase/update', [SupabaseApiController::class, 'update']);
 });
 Route::get('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
 Route::post('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);

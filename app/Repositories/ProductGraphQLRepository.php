@@ -136,61 +136,20 @@ class ProductGraphQLRepository
         }
 
         try {
-            $title = $product['notes'];
-            $imageUrl = $product['picture'];
-            $price = $product['price'];
-
             $createProductResponse = ShopifyGraphQL::createProductWithVariant(
                 $product
             );
-            if (!empty($createProductResponse['data']['productCreate']['product']['variants']['edges'][0]['node'])) {
-                $product = $createProductResponse['data']['productCreate']['product'];
-                $productGlobalId = $product['id'];
+            if (!empty($createProductResponse['data']['productCreate']['product'])) {
+                $createProduct = $createProductResponse['data']['productCreate']['product'];
+                $parts = explode('/', $createProduct['id']);
+                $productId = end($parts);
+                $product['shopify_product_id'] = $productId;
+                $product['id'] = $productId;
             } else {
                 throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
             }
 
-            $updateImageResponse = ShopifyGraphQL::replaceProductImage(
-                $productGlobalId,
-                $imageUrl,
-                $title,
-            );
-
-            $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
-
-            if (!$variantInfo) {
-                throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
-            }
-
-            $variantId = $variantInfo['variantId'];
-            $locationNumericId = ShopifyGraphQL::getLocationGlobalId($this->locationId);
-
-            Log::info('tengo la siguiente variante: ', [$variantId]);
-
-            $updateInventoryResponse = ShopifyGraphQL::updateInventoryByVariant(
-                $variantId,
-                $locationNumericId,
-                $product['qty']
-            );
-
-            $updatePriceResponse = ShopifyGraphQL::updatePriceByVariant(
-                $variantId,
-                $price,
-            );
-
-            Log::info('Producto creado correctamente:', [
-                'product_key' => $product['product_key'],
-                'response' => [
-                    'product' => $createProductResponse,
-                    'image' => $updateImageResponse,
-                    'inventory' => $updateInventoryResponse,
-                    'price' => $updatePriceResponse
-                ]
-            ]);
-
-            return [
-                'product' => $createProductResponse,
-            ];
+            return $product;
         } catch (\Exception $e) {
             Log::error('Error al actualizar producto:', [
                 'product_key' => $product['product_key'],

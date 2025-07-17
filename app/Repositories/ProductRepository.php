@@ -77,14 +77,6 @@ class ProductRepository
                 Log::error('Unexpected error:', ['errors' => $errors]);
             }
         }
-        /* if(isset($response['id'])){
-            Shopify::post('collects', [
-                'collect' => [
-                    'product_id' => $response['id'],
-                    'collection_id' => config('services.shopify.collection_id')
-                ]
-            ]);
-        } */
         return $response;
     }
 }
