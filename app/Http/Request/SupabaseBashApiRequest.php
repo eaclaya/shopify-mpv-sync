@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
-class SupabaseApiRequest extends FormRequest
+class SupabaseBashApiRequest extends FormRequest
 {
     public function authorize()
     {
@@ -16,10 +16,14 @@ class SupabaseApiRequest extends FormRequest
     public function rules(): array
     {
         $baseRules = [
-           'table_name' => [
-               'required',
-               'string',
-           ],
+            'table_name' => [
+                'required',
+                'string',
+            ],
+            'level' => [
+                'required',
+                'integer',
+            ],
            'data' => [
                'required',
                'array',
@@ -29,7 +33,7 @@ class SupabaseApiRequest extends FormRequest
         $dynamicTableRules = $this->getDynamicRulesForTable($tableName);
         $prefixedDynamicRules = [];
         foreach ($dynamicTableRules as $field => $rules) {
-            $prefixedDynamicRules['data.' . $field] = $rules;
+            $prefixedDynamicRules['data.*.' . $field] = $rules;
         }
         return array_merge($baseRules, $prefixedDynamicRules);
     }
@@ -42,6 +46,11 @@ class SupabaseApiRequest extends FormRequest
     public function getTableName(): string
     {
         return $this->input('table_name');
+    }
+
+    public function getLevel(): int
+    {
+        return $this->input('level');
     }
 
     protected function getDynamicRulesForTable($tableName): array

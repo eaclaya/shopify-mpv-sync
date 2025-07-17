@@ -23,5 +23,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/supabase/', [SupabaseApiController::class, 'store']);
     Route::post('/supabase/update', [SupabaseApiController::class, 'update']);
 });
-Route::get('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
-Route::post('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
+
+// Route::get('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
+// Route::post('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SupabaseApiRequest;
+use App\Http\Requests\SupabaseBashApiRequest;
 use App\Jobs\SentApiShopifyGraphQL;
+use App\Jobs\SentApiSupabase;
 use App\Repositories\SupabaseRepository;
 use Illuminate\Http\Request;
 
@@ -32,7 +34,7 @@ class SupabaseApiController extends Controller
                         $result = $data;
                     }
                     if (isset($result['supabase_id'])) {
-                        dispatch((new SentApiShopifyGraphQL($result))->delay(15));
+                        dispatch((new SentApiSupabase($result, $tableName))->delay(15));
                     }
                 }
             } catch (\Exception $e) {
@@ -44,9 +46,11 @@ class SupabaseApiController extends Controller
         return response()->json($result);
     }
 
-    public function update(SupabaseApiRequest $request)
+    public function update(SupabaseBashApiRequest $request)
     {
-        $data = $request->all();
+        $data = $request->getTableData();
+        $tableName = $request->getTableName();
+        $level = $request->getLevel() ?? null;
 
         try {
             if (is_array($data)) {
@@ -59,7 +63,7 @@ class SupabaseApiController extends Controller
                 foreach ($products as $product) {
                     $delay = $time * $count + ($level * $rowsQty * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
-                        dispatch((new SentApiShopifyGraphQL($product))->delay($delay));
+                        dispatch((new SentApiSupabase($product, $tableName))->delay($delay));
                         $count++;
                     }
                 }
