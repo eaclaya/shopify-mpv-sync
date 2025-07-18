@@ -22,13 +22,13 @@ class SupabaseService
     {
         $headers = [
             'Content-Type' => 'application/json',
-            'Apikey' => $this->anonKey,
+            // 'Apikey' => $this->anonKey,
             'Authorization' => 'Bearer ' . $this->anonKey,
             'Prefer' => 'return=representation',
         ];
 
         if ($useServiceRole) {
-            $headers['Apikey'] = $this->serviceRoleKey;
+            // $headers['Apikey'] = $this->serviceRoleKey;
             $headers['Authorization'] = 'Bearer ' . $this->serviceRoleKey;
         }
 
