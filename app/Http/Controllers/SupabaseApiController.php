@@ -27,7 +27,7 @@ class SupabaseApiController extends Controller
         $result = [];
         if (is_array($data)) {
             try {
-                if ($data['product_key'] && $data['notes'] && $data['price']) {
+                if ($data['sku'] && $data['name'] && $data['price']) {
                     if (!isset($data['supabase_id'])) {
                         $result = $this->repository->create($tableName, $data);
                     } else {
