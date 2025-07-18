@@ -34,7 +34,7 @@ class SupabaseApiController extends Controller
                         $result = $data;
                     }
                     if (isset($result['supabase_id'])) {
-                        dispatch((new SentApiSupabase($result, $tableName))->delay(15));
+                        // dispatch((new SentApiSupabase($result, $tableName))->delay(15));
                     }
                 }
             } catch (\Exception $e) {
@@ -63,7 +63,7 @@ class SupabaseApiController extends Controller
                 foreach ($products as $product) {
                     $delay = $time * $count + ($level * $rowsQty * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
-                        dispatch((new SentApiSupabase($product, $tableName))->delay($delay));
+                        // dispatch((new SentApiSupabase($product, $tableName))->delay($delay));
                         $count++;
                     }
                 }

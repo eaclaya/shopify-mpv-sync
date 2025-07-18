@@ -53,7 +53,6 @@ class SupabaseService
             $url = $this->baseUrl . $table . '?' . $column . '=eq.' . $value;
             $response = $this->makeRequest($table)->get($url, $query);
             $response->throw();
-
             return $response->json()[0] ?? null;
         } catch (\Exception $e) {
             Log::error("SupabaseApi Service Error (findBy - $table - $column=$value): " . $e->getMessage());
