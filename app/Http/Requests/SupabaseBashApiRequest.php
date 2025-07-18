@@ -29,9 +29,12 @@ class SupabaseBashApiRequest extends FormRequest
                'array',
            ],
         ];
-        $tableName = $this->getTableName();
-        $dynamicTableRules = $this->getDynamicRulesForTable($tableName);
         $prefixedDynamicRules = [];
+        $tableName = $this->getTableName();
+        if (trim($tableName) == '') {
+            return $baseRules;
+        }
+        $dynamicTableRules = $this->getDynamicRulesForTable($tableName);
         foreach ($dynamicTableRules as $field => $rules) {
             $prefixedDynamicRules['data.*.' . $field] = $rules;
         }
