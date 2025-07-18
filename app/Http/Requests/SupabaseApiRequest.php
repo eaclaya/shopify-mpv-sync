@@ -44,7 +44,7 @@ class SupabaseApiRequest extends FormRequest
 
     public function getTableName(): string
     {
-        return $this->input('table_name');
+        return $this->input('table_name', '');
     }
 
     protected function getDynamicRulesForTable($tableName): array

@@ -48,7 +48,7 @@ class SupabaseBashApiRequest extends FormRequest
 
     public function getTableName(): string
     {
-        return $this->input('table_name');
+        return $this->input('table_name', '');
     }
 
     public function getLevel(): int
