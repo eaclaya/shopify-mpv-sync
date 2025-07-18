@@ -37,7 +37,7 @@ class ShopifyApiController extends Controller
                     }
                     if (isset($result['shopify_product_id'])) {
                         Log::info('paso a actualizar el producto: ', $result);
-                        dispatch((new SentApiShopifyGraphQL($result))->delay(15));
+                        dispatch((new SentApiShopifyGraphQL($result))->delay(60));
                     }
                 }
             } catch (\Exception $e) {
