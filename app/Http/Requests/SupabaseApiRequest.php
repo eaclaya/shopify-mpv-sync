@@ -27,7 +27,7 @@ class SupabaseApiRequest extends FormRequest
         ];
         $prefixedDynamicRules = [];
         $tableName = $this->getTableName();
-        if (trim($tableName) == '') {
+        if (!$tableName || trim($tableName) == '') {
             return $baseRules;
         }
         $dynamicTableRules = $this->getDynamicRulesForTable($tableName);
