@@ -61,7 +61,7 @@ class SupabaseApiController extends Controller
                 $rowsQty = 25;
 
                 foreach ($products as $product) {
-                    $delay = $time * $count + ($level * $rowsQty * $time);
+                    // $delay = $time * $count + ($level * $rowsQty * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
                         // dispatch((new SentApiSupabase($product, $tableName))->delay($delay));
                         $count++;
@@ -73,6 +73,13 @@ class SupabaseApiController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error fetching products: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function getAll(Request $request)
+    {
+        $tableName = $request->input('table_name', '');
+        $result = $this->repository->getAll($tableName);
+        return response()->json($result);
     }
 
 }
