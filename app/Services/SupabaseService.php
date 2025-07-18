@@ -23,7 +23,7 @@ class SupabaseService
         $headers = [
             'Content-Type' => 'application/json',
             'Apikey' => $this->anonKey,
-            'Authorization' => 'Bearer ' . $this->anonKey,
+            'Authorization' => 'Bearer ' . $this->serviceRoleKey,
             'Prefer' => 'return=representation',
         ];
 
