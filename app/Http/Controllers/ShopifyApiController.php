@@ -39,6 +39,7 @@ class ShopifyApiController extends Controller
                         Log::info('paso a actualizar el producto: ', $result);
                         dispatch((new SentApiShopifyGraphQL($result))->delay(60));
                     }
+                    $result['id'] = $result['shopify_product_id'];
                 }
             } catch (\Exception $e) {
                 Log::error("ShopifyApi Service Error: " . $e->getMessage());
