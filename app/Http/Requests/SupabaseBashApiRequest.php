@@ -43,7 +43,7 @@ class SupabaseBashApiRequest extends FormRequest
 
     public function getTableData(): array
     {
-        return $this->except(['table_name']);
+        return $this->input('data', []);
     }
 
     public function getTableName(): string
