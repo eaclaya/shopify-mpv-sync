@@ -56,7 +56,7 @@ class ProductGraphQLRepository
 
         try {
             $title = $product['notes'];
-            $imageUrl = $product['picture'];
+            $imageUrl = isset($product['picture']) ? $product['picture'] : null;
             $price = $product['price'];
             $productGlobalId = $product['shopify_product_id'];
             $productGlobalId = ShopifyGraphQL::toGlobalId('Product', $productGlobalId);
