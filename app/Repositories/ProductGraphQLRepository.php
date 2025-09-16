@@ -41,8 +41,14 @@ class ProductGraphQLRepository
 
     public function update($product)
     {
+        Log::info('Tipo de $product:', [gettype($product)]);
+        Log::info('Contenido de $product:', [$product]);
+        if (is_object($product)) {
+            $product = (array) $product;
+            Log::info('se convieerte en array');
+        }
         if (!isset($product['shopify_product_id'])) {
-            Log::error('Producto no tiene imagen o ID de producto de Shopify:', [$product]);
+            Log::error('Producto no tiene ID de producto de Shopify:', [$product]);
             return;
         }
 
