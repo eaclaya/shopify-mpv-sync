@@ -60,17 +60,18 @@ class ShopifyApiController extends Controller
         try {
             if (is_array($data)) {
                 $products = $data['products'];
-                $level = isset($data['level']) ? $data['level'] : 0;
-                $count = 1;
-                $time = 90;
-                $rowsQty = 25;
+                $level = isset($data['level']) ? $data['level'] : 1;
+                $count = 0;
+                $time = 15;
 
                 foreach ($products as $product) {
-                    $delay = $time * $count + ($level * $rowsQty * $time);
+                    $delay = $level * ($count * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
                         Log::info('pase el check y paso a procesar el producto en un queue: ', [$product]);
                         dispatch((new SentApiShopifyGraphQL($product))->delay($delay));
                         $count++;
+                    } else {
+                        Log::error('no pase el check, por lo tanto no paso a un queue: ', [$product]);
                     }
                 }
                 return response()->json(['success' => 'Products have been updated successfully'], 200);
