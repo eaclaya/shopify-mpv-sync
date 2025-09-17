@@ -78,6 +78,7 @@ class ShopifyApiController extends Controller
             }
             return response()->json(['error' => 'Error fetching products'], 500);
         } catch (\Exception $e) {
+            Log::error('Hubo un error en el controlador: ', [$e->getMessage()]);
             return response()->json(['error' => 'Error fetching products: ' . $e->getMessage()], 500);
         }
     }
