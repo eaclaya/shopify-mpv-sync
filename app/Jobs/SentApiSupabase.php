@@ -10,9 +10,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class SentApiSupabase implements ShouldQueue, ShouldBeUniqueUntilProcessing
+// use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
+
+class SentApiSupabase implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -27,7 +28,7 @@ class SentApiSupabase implements ShouldQueue, ShouldBeUniqueUntilProcessing
      *
      * @var int
      */
-    public $uniqueFor = 60; // 1 hora
+    // public $uniqueFor = 60; // 1 hora
 
     /**
      * Create a new job instance.
