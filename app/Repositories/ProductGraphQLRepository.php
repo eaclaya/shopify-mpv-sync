@@ -145,7 +145,7 @@ class ProductGraphQLRepository
             $createProductResponse = ShopifyGraphQL::createProductWithVariant(
                 $product
             );
-            Log::info("al crear el producto {$product['product_key']} tengo la siguiente respuesta: ", [$product]);
+            Log::info("al crear el producto {$product['product_key']} tengo la siguiente respuesta: ", [$createProductResponse]);
             if (!empty($createProductResponse['data']['productCreate']['product'])) {
                 $createProduct = $createProductResponse['data']['productCreate']['product'];
                 $parts = explode('/', $createProduct['id']);
