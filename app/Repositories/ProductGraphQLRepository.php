@@ -141,19 +141,32 @@ class ProductGraphQLRepository
             return;
         }
 
+        if (is_object($product)) {
+            $product = (array) $product;
+        }
+
         try {
-            $createProductResponse = ShopifyGraphQL::createProductWithVariant(
-                $product
-            );
-            Log::info("al crear el producto {$product['product_key']} tengo la siguiente respuesta: ", [$createProductResponse]);
-            if (!empty($createProductResponse['data']['productCreate']['product'])) {
-                $createProduct = $createProductResponse['data']['productCreate']['product'];
-                $parts = explode('/', $createProduct['id']);
+            $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
+
+            if (!$variantInfo) {
+                $createProductResponse = ShopifyGraphQL::createProductWithVariant(
+                    $product
+                );
+                Log::info("al crear el producto {$product['product_key']} tengo la siguiente respuesta: ", [$createProductResponse]);
+                if (!empty($createProductResponse['data']['productCreate']['product'])) {
+                    $createProduct = $createProductResponse['data']['productCreate']['product'];
+                    $parts = explode('/', $createProduct['id']);
+                    $productId = end($parts);
+                    $product['shopify_product_id'] = $productId;
+                    $product['id'] = $productId;
+                } else {
+                    throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
+                }
+            } else {
+                $parts = explode('/', $variantInfo['productId']);
                 $productId = end($parts);
                 $product['shopify_product_id'] = $productId;
                 $product['id'] = $productId;
-            } else {
-                throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
             }
 
             return $product;

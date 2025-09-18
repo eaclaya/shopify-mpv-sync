@@ -89,6 +89,8 @@ class ShopifyGraphQLService
 
         $response = $this->query($query, ['sku' => $sku]);
 
+        Log::info("En el producto, {$sku}, tengo el siguiente variant de respuesta: ", [ $response ]);
+
         $variantEdge = $response['data']['productVariants']['edges'][0]['node'] ?? null;
 
         return $variantEdge ? [
@@ -319,15 +321,16 @@ class ShopifyGraphQLService
                         title
                         vendor
                         status
-                        published
                         variants(first: 1) {
-                            node {
-                                id
-                                price
-                                sku
-                                inventoryItem {
+                            edges {
+                                node {
                                     id
-                                    tracked
+                                    price
+                                    sku
+                                    inventoryItem {
+                                        id
+                                        tracked
+                                    }
                                 }
                             }
                         }
@@ -345,7 +348,6 @@ class ShopifyGraphQLService
                 'title' => $product['notes'],
                 'vendor' => 'KM Motos',
                 'status' => 'ACTIVE',
-                'published' => true,
                 'variants' => [[
                     'price' => number_format($product['price'], 2, '.', ''),
                     'sku' => $product['product_key'],
