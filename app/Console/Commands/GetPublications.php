@@ -34,9 +34,9 @@ class GetPublications extends Command
         $this->info('Running GetPublications command...');
 
         $publications = ShopifyGraphQL::getPublications();
-        $edges = $publications['data']['publications']['edges'];
+        $edgesPublications = $publications['data']['publications']['edges'];
         $arrayPublications = [];
-        foreach ($edges as $edge) {
+        foreach ($edgesPublications as $edge) {
             $arrayPublications[] = [
                 'publicationId' => $edge['node']['id'],
                 'publishDate' => null,

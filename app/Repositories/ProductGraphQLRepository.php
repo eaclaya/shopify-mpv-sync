@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Facades\ShopifyGraphQL;
 use App\Models\Product;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -164,6 +165,17 @@ class ProductGraphQLRepository
                     $productId = end($parts);
                     $product['shopify_product_id'] = $productId;
                     $product['id'] = $productId;
+
+                    $publications = ShopifyGraphQL::getPublications();
+                    $edgesPublications = $publications['data']['publications']['edges'];
+                    $arrayPublications = [];
+                    foreach ($edgesPublications as $edge) {
+                        $arrayPublications[] = [
+                            'publicationId' => $edge['node']['id'],
+                            'publishDate' => Carbon::now('UTC')->format('Y-m-d\TH:i:s\Z'),
+                        ];
+                    }
+                    ShopifyGraphQL::setPublicationsInToProduct($productId, $arrayPublications);
                 } else {
                     throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
                 }
