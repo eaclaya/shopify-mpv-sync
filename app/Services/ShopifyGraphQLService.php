@@ -366,16 +366,18 @@ class ShopifyGraphQLService
     public function getPublications(): array
     {
         $query = '
-            query publications {
-                publications(first: 10) {
+            query PublicationList($first: Int!) {
+                publications(first: $first) {
                     edges {
                         node {
                             id
+                            name
                         }
                     }
                 }
             }
         ';
-        return $this->query($query, []);
+        $variables = ['first' => 10];
+        return $this->query($query, $variables);
     }
 }
