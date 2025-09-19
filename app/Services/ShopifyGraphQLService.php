@@ -314,7 +314,7 @@ class ShopifyGraphQLService
     public function createProductWithVariant(array $product): array
     {
         $mutation = '
-            mutation productCreate($input: ProductCreateInput!) {
+            mutation productCreate($input: ProductInput!) {
                 productCreate(input: $input) {
                     product {
                         id
@@ -322,13 +322,15 @@ class ShopifyGraphQLService
                         vendor
                         status
                         variants(first: 1) {
-                            nodes {
-                                id
-                                price
-                                sku
-                                inventoryItem {
+                            edges {
+                                node {
                                     id
-                                    tracked
+                                    price
+                                    sku
+                                    inventoryItem {
+                                        id
+                                        tracked
+                                    }
                                 }
                             }
                         }
