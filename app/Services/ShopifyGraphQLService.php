@@ -380,4 +380,22 @@ class ShopifyGraphQLService
         $variables = ['first' => 10];
         return $this->query($query, $variables);
     }
+
+    public function setPublicationsInToProduct($productId, array $publicationIds): array
+    {
+        $mutation = '
+            mutation productUpdate($input: ProductInput!) {
+                productUpdate(input: $input) {
+                    product {
+                        id
+                        title
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+    }
 }

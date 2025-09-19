@@ -33,8 +33,13 @@ class GetPublications extends Command
         $this->info('Running GetPublications command...');
 
         $publications = ShopifyGraphQL::getPublications();
-        Log::info('publications: ', [ $publications ]);
-        var_dump($publications);
+        $edges = $publications['data']['publications']['edges'];
+        $arrayPublications = [];
+        foreach ($edges as $edge) {
+            $arrayPublications[] = $edge['node'];
+        }
+        Log::info('publications: ', [ $arrayPublications ]);
+        var_dump($arrayPublications);
         $this->info('Finish GetPublications command...');
         return 0;
     }
