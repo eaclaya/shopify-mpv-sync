@@ -89,7 +89,7 @@ class ShopifyGraphQLService
 
         $response = $this->query($query, ['sku' => $sku]);
 
-        Log::info("En el producto, {$sku}, tengo el siguiente variant de respuesta: ", [ $response ]);
+        Log::info("En getProductAndVariantBySku del producto, {$sku}, tengo el siguiente variant de respuesta: ", [ $response ]);
 
         $variantEdge = $response['data']['productVariants']['edges'][0]['node'] ?? null;
 
@@ -322,15 +322,13 @@ class ShopifyGraphQLService
                         vendor
                         status
                         variants(first: 1) {
-                            edges {
-                                node {
+                            nodes {
+                                id
+                                price
+                                sku
+                                inventoryItem {
                                     id
-                                    price
-                                    sku
-                                    inventoryItem {
-                                        id
-                                        tracked
-                                    }
+                                    tracked
                                 }
                             }
                         }
