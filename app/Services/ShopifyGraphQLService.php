@@ -351,13 +351,32 @@ class ShopifyGraphQLService
                 'vendor' => 'KM Motos',
                 'status' => 'ACTIVE',
                 'published' => true,
-                'variants' => [[
-                    'price' => number_format($product['price'], 2, '.', ''),
-                    'sku' => $product['product_key'],
-                ]],
+                'variants' => [
+                    [
+                        'price' => number_format($product['price'], 2, '.', ''),
+                        'sku' => $product['product_key'],
+                    ]
+                ],
             ]
         ];
 
         return $this->mutation($mutation, $variables);
+    }
+
+    public function getPublications(): array
+    {
+        $query = '
+            query PublicationList {
+                publications {
+                    edges {
+                        node {
+                            id
+                            name
+                        }
+                    }
+                }
+            }
+        ';
+        return $this->query($query);
     }
 }

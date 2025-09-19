@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\ShopifyGraphQL;
 use App\Jobs\SentApiShopifyGraphQL;
 use App\Repositories\ProductGraphQLRepository;
 // use App\Repositories\ProductRepository;
