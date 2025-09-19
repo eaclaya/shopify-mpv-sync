@@ -367,7 +367,7 @@ class ShopifyGraphQLService
     {
         $query = '
             query PublicationList {
-                publications {
+                publications(first: 10) {
                     edges {
                         node {
                             id
