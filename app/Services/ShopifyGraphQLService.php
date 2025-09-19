@@ -366,7 +366,7 @@ class ShopifyGraphQLService
     public function getPublications(): array
     {
         $query = '
-            query PublicationList {
+            query publications {
                 publications(first: 10) {
                     edges {
                         node {
@@ -377,6 +377,6 @@ class ShopifyGraphQLService
                 }
             }
         ';
-        return $this->query($query);
+        return $this->query($query, []);
     }
 }
