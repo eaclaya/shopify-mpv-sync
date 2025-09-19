@@ -48,8 +48,13 @@ class ProductGraphQLRepository
             Log::info('se convieerte en array');
         }
         if (!isset($product['shopify_product_id'])) {
-            Log::error('Producto no tiene ID de producto de Shopify:', [$product]);
-            return;
+            $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
+            if (!$variantInfo) {
+                Log::error('Producto no tiene ID de producto de Shopify:', [$product]);
+                return;
+            }
+            $parts = explode('/', $variantInfo['productId']);
+            $product['shopify_product_id'] = end($parts);
         }
 
         Log::info('Se Procede a actualizar el Siguiente Producto:', [$product['product_key']]);
