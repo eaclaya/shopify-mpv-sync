@@ -371,7 +371,6 @@ class ShopifyGraphQLService
                     edges {
                         node {
                             id
-                            name
                         }
                     }
                 }
