@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Facades\ShopifyGraphQL;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +37,10 @@ class GetPublications extends Command
         $edges = $publications['data']['publications']['edges'];
         $arrayPublications = [];
         foreach ($edges as $edge) {
-            $arrayPublications[] = $edge['node'];
+            $arrayPublications[] = [
+                'publicationId' => $edge['node']['id'],
+                'publishDate' => null,
+            ];
         }
         Log::info('publications: ', [ $arrayPublications ]);
         var_dump($arrayPublications);
