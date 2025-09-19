@@ -321,6 +321,8 @@ class ShopifyGraphQLService
                         title
                         vendor
                         status
+                        publishedAt
+                        onlineStoreUrl
                         variants(first: 1) {
                             edges {
                                 node {
@@ -348,6 +350,7 @@ class ShopifyGraphQLService
                 'title' => $product['notes'],
                 'vendor' => 'KM Motos',
                 'status' => 'ACTIVE',
+                'published' => true,
                 'variants' => [[
                     'price' => number_format($product['price'], 2, '.', ''),
                     'sku' => $product['product_key'],
