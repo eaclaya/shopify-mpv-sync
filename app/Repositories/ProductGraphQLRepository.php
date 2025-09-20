@@ -42,23 +42,18 @@ class ProductGraphQLRepository
 
     public function update($product)
     {
-        Log::info('Tipo de $product:', [gettype($product)]);
-        Log::info('Contenido de $product:', [$product]);
         if (is_object($product)) {
             $product = (array) $product;
-            Log::info('se convieerte en array');
         }
         if (!isset($product['shopify_product_id'])) {
             $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
             if (!$variantInfo) {
-                Log::error('Producto no tiene ID de producto de Shopify:', [$product]);
-                return;
+                Log::error('Producto no tiene ID de producto de Shopify: ', [$product]);
+                throw new \Exception("Producto no tiene ID de producto de Shopify: {$product['product_key']}");
             }
             $parts = explode('/', $variantInfo['productId']);
             $product['shopify_product_id'] = end($parts);
         }
-
-        Log::info('Se Procede a actualizar el Siguiente Producto:', [$product['product_key']]);
 
         try {
             $title = $product['notes'];
@@ -98,13 +93,10 @@ class ProductGraphQLRepository
 
             if (!$variantInfo) {
                 throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
-                return;
             }
 
             $variantId = $variantInfo['variantId'];
             $locationNumericId = ShopifyGraphQL::getLocationGlobalId($this->locationId);
-
-            Log::info('tengo la siguiente variante: ', [$variantId]);
 
             $updateInventoryResponse = ShopifyGraphQL::updateInventoryByVariant(
                 $variantId,
@@ -132,19 +124,19 @@ class ProductGraphQLRepository
                 'inventory' => $updateInventoryResponse,
             ];
         } catch (\Exception $e) {
-            Log::error('Error al actualizar producto:', [
+            Log::error('Error al actualizar producto: ', [
                 'product_key' => $product['product_key'],
                 'error' => $e->getMessage(),
             ]);
-            return ['error' => $e->getMessage()];
+            throw new \Exception("Error al actualizar producto: {$product['product_key']}");
         }
     }
 
     public function create($product)
     {
         if (!isset($product['picture'])) {
-            Log::error('Producto no tiene imagen:', [$product]);
-            return;
+            Log::error('Producto no tiene imagen: ', [$product]);
+            throw new \Exception("Producto no tiene imagen: {$product['product_key']}");
         }
 
         if (is_object($product)) {
@@ -158,7 +150,6 @@ class ProductGraphQLRepository
                 $createProductResponse = ShopifyGraphQL::createProductWithVariant(
                     $product
                 );
-                Log::info("al crear el producto {$product['product_key']} tengo la siguiente respuesta: ", [$createProductResponse]);
                 if (!empty($createProductResponse['data']['productCreate']['product'])) {
                     $createProduct = $createProductResponse['data']['productCreate']['product'];
                     $parts = explode('/', $createProduct['id']);
@@ -186,13 +177,14 @@ class ProductGraphQLRepository
                 $product['id'] = $productId;
             }
 
+            Log::error('Producto creado exitosamente: ', [$product]);
             return $product;
         } catch (\Exception $e) {
             Log::error('Error al actualizar producto:', [
                 'product_key' => $product['product_key'],
                 'error' => $e->getMessage(),
             ]);
-            return ['error' => $e->getMessage()];
+            throw new \Exception("Error al crear producto: {$product['product_key']}");
         }
     }
 }
