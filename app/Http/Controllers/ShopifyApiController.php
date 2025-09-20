@@ -60,10 +60,14 @@ class ShopifyApiController extends Controller
 
         try {
             if (is_array($data)) {
-                $products = $data['products'];
+                $products = isset($data['products']) ? $data['products'] : null;
                 $level = isset($data['level']) ? $data['level'] : 1;
                 $count = 0;
                 $time = 15;
+
+                if (!isset($products)) {
+                    return response()->json(['success' => 'No products found'], 200);
+                }
 
                 foreach ($products as $product) {
                     $delay = $level * ($count * $time);
