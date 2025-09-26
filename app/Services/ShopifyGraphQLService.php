@@ -411,4 +411,48 @@ class ShopifyGraphQLService
 
         return $this->mutation($mutation, $variables);
     }
+
+    public function getOrdersByNumber($orderNumber)
+    {
+        $query = '
+            query GetOrderByOrderNumber($orderNumber: String!) {
+                orders(query: $orderNumber, first: 1) {
+                    edges {
+                        node {
+                            id
+                            name
+                            createdAt
+                            customer {
+                                firstName
+                                lastName
+                                email
+                            }
+                            totalPriceSet {
+                                shopMoney {
+                                    amount
+                                    currencyCode
+                                }
+                            }
+                            lineItems(first: 50) {
+                                edges {
+                                    node {
+                                        id
+                                        name
+                                        quantity
+                                        variant {
+                                            title
+                                            sku
+                                            price
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ';
+        $variables = ['orderNumber' => "name:#{$orderNumber}"];
+        return $this->query($query, $variables);
+    }
 }
