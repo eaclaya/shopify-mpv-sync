@@ -35,7 +35,7 @@ class GetOrders extends Command
         $this->info('Running GetOrders command...');
 
         $publications = ShopifyGraphQL::getOrdersByNumber($orderNumber);
-        // $edgesPublications = $publications['data']['publications']['edges'];
+        $edgesPublications = $publications['data']['orders']['edges'];
         // $arrayPublications = [];
         // foreach ($edgesPublications as $edge) {
         //     $arrayPublications[] = [
@@ -44,7 +44,7 @@ class GetOrders extends Command
         //     ];
         // }
         // Log::info('publications: ', [ $arrayPublications ]);
-        var_dump($publications);
+        var_dump($edgesPublications);
         $this->info('Finish GetOrders command...');
         return 0;
     }

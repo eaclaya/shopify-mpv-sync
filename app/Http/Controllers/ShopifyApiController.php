@@ -20,7 +20,6 @@ class ShopifyApiController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
         $result = [];
         if (is_array($data)) {
             try {
@@ -57,18 +56,15 @@ class ShopifyApiController extends Controller
     public function update(Request $request)
     {
         $data = $request->all();
-
         try {
             if (is_array($data)) {
                 $products = isset($data['products']) ? $data['products'] : null;
                 $level = isset($data['level']) ? $data['level'] : 1;
                 $count = 0;
                 $time = 15;
-
                 if (!isset($products)) {
                     return response()->json(['success' => 'No products found'], 200);
                 }
-
                 foreach ($products as $product) {
                     $delay = $level * ($count * $time);
                     if ($product['product_key'] && $product['notes'] && $product['price']) {
@@ -88,4 +84,12 @@ class ShopifyApiController extends Controller
         }
     }
 
+    public function getOrders(Request $request)
+    {
+        $data = $request->all();
+        Log::info('E recibido los siguientes datos: ', $data);
+        $result = ShopifyGraphQL::getOrders($data);
+        Log::info('retorno el siguiente resultado: ', $result);
+        return response()->json(['orders' => $result], 200);
+    }
 }
