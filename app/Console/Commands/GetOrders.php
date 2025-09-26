@@ -34,17 +34,25 @@ class GetOrders extends Command
         $orderNumber = !isset($orderNumber) ? 2594 : $orderNumber;
         $this->info('Running GetOrders command...');
 
-        $publications = ShopifyGraphQL::getOrdersByNumber($orderNumber);
-        $edgesPublications = $publications['data']['orders']['edges'][0]['node'];
-        // $arrayPublications = [];
-        // foreach ($edgesPublications as $edge) {
-        //     $arrayPublications[] = [
-        //         'publicationId' => $edge['node']['id'],
-        //         'publishDate' => null,
-        //     ];
-        // }
-        // Log::info('publications: ', [ $arrayPublications ]);
-        var_dump($edgesPublications);
+        $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
+        $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
+        $arrayOrders = [];
+        $lineItems = $edgesOrders['lineItems']['edges'];
+        $products = [];
+        foreach ($lineItems as $lineItem) {
+            $products[] = [
+                $lineItem['node']['quantity'],
+                $lineItem['node']['variant']['sku'],
+                $lineItem['node']['variant']['price'],
+            ];
+        }
+        $arrayOrders[] = [
+            'client' => $edgesOrders['customer'],
+            'address' => $edgesOrders['shippingAddress'],
+            'products' => $products,
+        ];
+        Log::info('orders: ', [ $arrayOrders ]);
+        var_dump($arrayOrders);
         $this->info('Finish GetOrders command...');
         return 0;
     }
