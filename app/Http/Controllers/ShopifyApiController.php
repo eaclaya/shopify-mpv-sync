@@ -87,9 +87,28 @@ class ShopifyApiController extends Controller
     public function getOrders(Request $request)
     {
         $data = $request->all();
-        Log::info('E recibido los siguientes datos: ', $data);
-        $result = ShopifyGraphQL::getOrders($data);
-        Log::info('retorno el siguiente resultado: ', $result);
+        $orderNumber = isset($data['order_number']) ? $data['order_number'] : null;
+        if (!isset($orderNumber)) {
+            return response()->json(['error' => 'No se recibio un numero de orden'], 500);
+        }
+        Log::info('E recibido el siguiente numero de orden: ', $orderNumber);
+        $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
+        $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
+        $lineItems = $edgesOrders['lineItems']['edges'];
+        $products = [];
+        foreach ($lineItems as $lineItem) {
+            $products[] = [
+                'product_key' => $lineItem['node']['variant']['sku'],
+                'qty' => $lineItem['node']['quantity'],
+                'price' => $lineItem['node']['variant']['price'],
+            ];
+        }
+        $result[] = [
+            'client' => $edgesOrders['customer'],
+            'address' => $edgesOrders['shippingAddress'],
+            'products' => $products,
+        ];
+        Log::info('orders: ', [ $result ]);
         return response()->json(['orders' => $result], 200);
     }
 }

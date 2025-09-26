@@ -36,7 +36,6 @@ class GetOrders extends Command
 
         $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
         $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
-        $arrayOrders = [];
         $lineItems = $edgesOrders['lineItems']['edges'];
         $products = [];
         foreach ($lineItems as $lineItem) {
@@ -46,13 +45,13 @@ class GetOrders extends Command
                 'price' => $lineItem['node']['variant']['price'],
             ];
         }
-        $arrayOrders[] = [
+        $result[] = [
             'client' => $edgesOrders['customer'],
             'address' => $edgesOrders['shippingAddress'],
             'products' => $products,
         ];
-        Log::info('orders: ', [ $arrayOrders ]);
-        var_dump($arrayOrders);
+        Log::info('orders: ', [ $result ]);
+        var_dump($result);
         $this->info('Finish GetOrders command...');
         return 0;
     }
