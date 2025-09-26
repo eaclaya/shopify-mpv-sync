@@ -91,7 +91,7 @@ class ShopifyApiController extends Controller
         if (!isset($orderNumber)) {
             return response()->json(['error' => 'No se recibio un numero de orden'], 500);
         }
-        Log::info('E recibido el siguiente numero de orden: ', $orderNumber);
+        Log::info('E recibido el siguiente numero de orden: ', [ $orderNumber ]);
         $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
         $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
         $lineItems = $edgesOrders['lineItems']['edges'];
