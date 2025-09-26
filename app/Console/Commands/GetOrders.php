@@ -34,7 +34,7 @@ class GetOrders extends Command
         $orderNumber = !isset($orderNumber) ? 2594 : $orderNumber;
         $this->info('Running GetOrders command...');
 
-        $publications = ShopifyGraphQL::getOrdersByNumber();
+        $publications = ShopifyGraphQL::getOrdersByNumber($orderNumber);
         // $edgesPublications = $publications['data']['publications']['edges'];
         // $arrayPublications = [];
         // foreach ($edgesPublications as $edge) {
