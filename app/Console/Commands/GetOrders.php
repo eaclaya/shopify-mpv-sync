@@ -35,7 +35,7 @@ class GetOrders extends Command
         $this->info('Running GetOrders command...');
 
         $publications = ShopifyGraphQL::getOrdersByNumber($orderNumber);
-        $edgesPublications = $publications['data']['orders']['edges'];
+        $edgesPublications = $publications['data']['orders']['edges'][0]['node'];
         // $arrayPublications = [];
         // foreach ($edgesPublications as $edge) {
         //     $arrayPublications[] = [
