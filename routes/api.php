@@ -20,6 +20,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/shopify/products', [ShopifyApiController::class, 'store']);
     Route::post('/shopify/products/update', [ShopifyApiController::class, 'update']);
 
+    Route::post('/shopify/get_orders', [ShopifyApiController::class, 'getOrders']);
+
     Route::post('/supabase/', [SupabaseApiController::class, 'store']);
     Route::post('/supabase/update', [SupabaseApiController::class, 'update']);
     Route::get('/supabase/get-all', [SupabaseApiController::class, 'getAll']);
