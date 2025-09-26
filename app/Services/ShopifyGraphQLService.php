@@ -427,6 +427,16 @@ class ShopifyGraphQLService
                                 lastName
                                 email
                             }
+                            shippingAddress {
+                                name
+                                address1
+                                address2
+                                city
+                                province
+                                country
+                                zip
+                                phone
+                            }
                             totalPriceSet {
                                 shopMoney {
                                     amount
