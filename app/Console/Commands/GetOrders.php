@@ -33,7 +33,7 @@ class GetOrders extends Command
         // Acá va la lógica que quieras ejecutar
         $this->info('Running GetOrders command...');
 
-        $publications = ShopifyGraphQL::getPublications();
+        $publications = ShopifyGraphQL::GetOrders();
         // $edgesPublications = $publications['data']['publications']['edges'];
         // $arrayPublications = [];
         // foreach ($edgesPublications as $edge) {
