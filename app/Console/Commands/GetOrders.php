@@ -14,7 +14,7 @@ class GetOrders extends Command
      *
      * @var string
      */
-    protected $signature = 'get:orders';
+    protected $signature = 'get:orders {orderNumber?}';
 
     /**
      * The console command description.
@@ -30,7 +30,8 @@ class GetOrders extends Command
      */
     public function handle()
     {
-        // Acá va la lógica que quieras ejecutar
+        $orderNumber = $this->argument('orderNumber');
+        $orderNumber = !isset($orderNumber) ? 2594 : $orderNumber;
         $this->info('Running GetOrders command...');
 
         $publications = ShopifyGraphQL::getOrdersByNumber();
