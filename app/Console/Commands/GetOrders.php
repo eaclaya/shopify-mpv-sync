@@ -41,9 +41,9 @@ class GetOrders extends Command
         $products = [];
         foreach ($lineItems as $lineItem) {
             $products[] = [
-                $lineItem['node']['quantity'],
-                $lineItem['node']['variant']['sku'],
-                $lineItem['node']['variant']['price'],
+                'product_key' => $lineItem['node']['variant']['sku'],
+                'qty' => $lineItem['node']['quantity'],
+                'price' => $lineItem['node']['variant']['price'],
             ];
         }
         $arrayOrders[] = [
