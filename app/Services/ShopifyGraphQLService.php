@@ -449,23 +449,12 @@ class ShopifyGraphQLService
                                         id
                                         name
                                         quantity
+                                        currentQuantity
                                         variant {
                                             title
                                             sku
                                             price
                                         }
-                                    }
-                                }
-                            }
-                            refunds {
-                                id
-                                createdAt
-                                note
-                                refundLineItems(first: 50) {
-                                    restockType
-                                    quantity
-                                    lineItem {
-                                        id
                                     }
                                 }
                             }

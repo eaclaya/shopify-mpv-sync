@@ -31,7 +31,7 @@ class GetOrders extends Command
     public function handle()
     {
         $orderNumber = $this->argument('orderNumber');
-        $orderNumber = !isset($orderNumber) ? 2594 : $orderNumber;
+        $orderNumber = !isset($orderNumber) ? 2591 : $orderNumber;
         $this->info('Running GetOrders command...');
 
         $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
