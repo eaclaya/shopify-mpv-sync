@@ -40,6 +40,7 @@ class GetOrders extends Command
         var_dump('----');
         $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
         $lineItems = $edgesOrders['lineItems']['edges'];
+        $taxLines = $edgesOrders['taxLines'][0]['rate'];
         $products = [];
         foreach ($lineItems as $lineItem) {
             $products[] = [
@@ -52,6 +53,7 @@ class GetOrders extends Command
             'client' => $edgesOrders['customer'],
             'address' => $edgesOrders['shippingAddress'],
             'products' => $products,
+            'rate' => $taxLines,
         ];
         Log::info('orders: ', [ $result ]);
         var_dump($result);
