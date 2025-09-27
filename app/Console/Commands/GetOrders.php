@@ -35,6 +35,9 @@ class GetOrders extends Command
         $this->info('Running GetOrders command...');
 
         $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
+        var_dump('$orders');
+        var_dump($orders);
+        var_dump('----');
         $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
         $lineItems = $edgesOrders['lineItems']['edges'];
         $products = [];
