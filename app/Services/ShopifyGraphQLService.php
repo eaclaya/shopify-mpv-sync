@@ -443,7 +443,7 @@ class ShopifyGraphQLService
                                     currencyCode
                                 }
                             }
-                            lineItems(first: 50) {
+                            lineItems(first: 300) {
                                 edges {
                                     node {
                                         id
@@ -454,6 +454,18 @@ class ShopifyGraphQLService
                                             sku
                                             price
                                         }
+                                    }
+                                }
+                            }
+                            refunds {
+                                id
+                                createdAt
+                                note
+                                refundLineItems(first: 50) {
+                                    restockType
+                                    quantity
+                                    lineItem {
+                                        id
                                     }
                                 }
                             }
