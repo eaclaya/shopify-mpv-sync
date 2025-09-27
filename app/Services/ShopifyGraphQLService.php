@@ -457,6 +457,21 @@ class ShopifyGraphQLService
                                     }
                                 }
                             }
+                            totalTaxSet {
+                                shopMoney {
+                                    amount
+                                    currencyCode
+                                }
+                            }
+                            taxLines {
+                                title
+                                rate
+                                priceSet {
+                                    shopMoney {
+                                        amount
+                                    }
+                                }
+                            }
                         }
                     }
                 }
