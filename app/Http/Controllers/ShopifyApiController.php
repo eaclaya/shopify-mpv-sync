@@ -95,6 +95,7 @@ class ShopifyApiController extends Controller
         $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
         $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
         $lineItems = $edgesOrders['lineItems']['edges'];
+        $taxLines = $edgesOrders['taxLines'][0]['rate'];
         $products = [];
         foreach ($lineItems as $lineItem) {
             $products[] = [
@@ -107,6 +108,7 @@ class ShopifyApiController extends Controller
             'client' => $edgesOrders['customer'],
             'address' => $edgesOrders['shippingAddress'],
             'products' => $products,
+            'rate' => $taxLines,
         ];
         Log::info('orders: ', [ $result ]);
         return response()->json(['orders' => $result], 200);
