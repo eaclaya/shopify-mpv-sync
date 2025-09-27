@@ -443,7 +443,7 @@ class ShopifyGraphQLService
                                     currencyCode
                                 }
                             }
-                            lineItems(first: 300) {
+                            lineItems(first: 250) {
                                 edges {
                                     node {
                                         id
