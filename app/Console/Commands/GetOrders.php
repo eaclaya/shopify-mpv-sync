@@ -43,9 +43,13 @@ class GetOrders extends Command
         $taxLines = $edgesOrders['taxLines'][0]['rate'];
         $products = [];
         foreach ($lineItems as $lineItem) {
+            $qty = $lineItem['node']['currentQuantity'];
+            if ($qty == 0) {
+                continue;
+            }
             $products[] = [
                 'product_key' => $lineItem['node']['variant']['sku'],
-                'qty' => $lineItem['node']['quantity'],
+                'qty' => $qty,
                 'price' => $lineItem['node']['variant']['price'],
             ];
         }
