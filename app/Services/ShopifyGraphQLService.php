@@ -72,7 +72,7 @@ class ShopifyGraphQLService
     {
         $query = '
             query getProductBySku($sku: String!) {
-                productVariants(first: 10, query: $sku) {
+                productVariants(first: 20, query: $sku) {
                     edges {
                         node {
                             id
@@ -91,7 +91,14 @@ class ShopifyGraphQLService
 
         Log::info("En getProductAndVariantBySku del producto, {$sku}, tengo el siguiente variant de respuesta: ", [ $response ]);
 
-        $variantEdge = $response['data']['productVariants']['edges'][0]['node'] ?? null;
+        $edges = $response['data']['productVariants']['edges'] ?? null;
+        $variantEdge = null;
+        foreach ($edges as $edge) {
+            if (strtolower(trim($edge['node']['sku'])) === strtolower(trim($sku))) {
+                $variantEdge = $edge['node'];
+                break;
+            }
+        }
 
         return $variantEdge ? [
             'variantId' => $variantEdge['id'],
