@@ -180,7 +180,7 @@ class ProductGraphQLRepository
             Log::error('Producto creado exitosamente: ', [$product]);
             return $product;
         } catch (\Exception $e) {
-            Log::error('Error al actualizar producto:', [
+            Log::error('Error al crear producto:', [
                 'product_key' => $product['product_key'],
                 'error' => $e->getMessage(),
             ]);
