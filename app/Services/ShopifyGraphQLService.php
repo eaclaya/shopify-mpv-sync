@@ -458,37 +458,28 @@ class ShopifyGraphQLService
                                         quantity
                                         currentQuantity
 
-                                        ## originalTotalPriceSet {
-                                        ##    shopMoney {
-                                        ##        amount
-                                        ##        currencyCode
-                                        ##    }
-                                        ##}
+                                        discountAllocations {
+                                            allocatedAmountSet {
+                                                shopMoney {
+                                                    amount
+                                                    currencyCode
+                                                }
+                                            }
+                                        }
 
-                                        discountedTotalPriceSet {
+                                        originalTotalSet {
                                             shopMoney {
                                                 amount
                                                 currencyCode
                                             }
                                         }
 
-                                        ## discountAllocations {
-                                        ##     allocatedAmountSet {
-                                        ##         shopMoney {
-                                        ##             amount
-                                        ##             currencyCode
-                                        ##         }
-                                        ##     }
-                                        ##     discountApplication {
-                                        ##         ... on DiscountCodeApplication {
-                                        ##             code
-                                        ##             title
-                                        ##         }
-                                        ##         ... on AutomaticDiscountApplication {
-                                        ##             title
-                                        ##         }
-                                        ##     }
-                                        ## }
+                                        discountedTotalSet {
+                                            shopMoney {
+                                                amount
+                                                currencyCode
+                                            }
+                                        }
 
                                         variant {
                                             title
@@ -496,6 +487,12 @@ class ShopifyGraphQLService
                                             price
                                         }
                                     }
+                                }
+                            }
+                            totalDiscountsSet {
+                                shopMoney {
+                                    amount
+                                    currencyCode
                                 }
                             }
                             totalTaxSet {
