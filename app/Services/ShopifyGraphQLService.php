@@ -458,17 +458,13 @@ class ShopifyGraphQLService
                                         quantity
                                         currentQuantity
 
-                                        # --- CAMPOS AGREGADOS ---
+                                        ## originalTotalPriceSet {
+                                        ##    shopMoney {
+                                        ##        amount
+                                        ##        currencyCode
+                                        ##    }
+                                        ##}
 
-                                        # Precio original de la línea (cantidad * precio original unitario)
-                                        originalTotalPriceSet {
-                                            shopMoney {
-                                                amount
-                                                currencyCode
-                                            }
-                                        }
-
-                                        # Precio final de la línea ya con descuentos aplicados
                                         discountedTotalPriceSet {
                                             shopMoney {
                                                 amount
@@ -476,26 +472,23 @@ class ShopifyGraphQLService
                                             }
                                         }
 
-                                        # Aquí está la magia: Detalle de los descuentos aplicados a esta línea
-                                        discountAllocations {
-                                            allocatedAmountSet {
-                                                shopMoney {
-                                                    amount
-                                                    currencyCode
-                                                }
-                                            }
-                                            discountApplication {
-                                                ... on DiscountCodeApplication {
-                                                    code
-                                                    title
-                                                }
-                                                ... on AutomaticDiscountApplication {
-                                                    title
-                                                }
-                                            }
-                                        }
-
-                                        # --- FIN DE CAMPOS AGREGADOS ---
+                                        ## discountAllocations {
+                                        ##     allocatedAmountSet {
+                                        ##         shopMoney {
+                                        ##             amount
+                                        ##             currencyCode
+                                        ##         }
+                                        ##     }
+                                        ##     discountApplication {
+                                        ##         ... on DiscountCodeApplication {
+                                        ##             code
+                                        ##             title
+                                        ##         }
+                                        ##         ... on AutomaticDiscountApplication {
+                                        ##             title
+                                        ##         }
+                                        ##     }
+                                        ## }
 
                                         variant {
                                             title
