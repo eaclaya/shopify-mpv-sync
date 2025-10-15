@@ -47,10 +47,16 @@ class GetOrders extends Command
             if ($qty == 0) {
                 continue;
             }
+            $currentPrice = $price = $lineItem['node']['variant']['price'];
+            $discountPrice = isset($lineItem['node']['discountedTotalSet']['shopMoney']['amount']) && !empty($lineItem['node']['discountedTotalSet']['shopMoney']['amount'])
+                    ? $lineItem['node']['discountedTotalSet']['shopMoney']['amount'] : null;
+            if (isset($discountPrice) && $discountPrice < $price) {
+                $currentPrice = $discountPrice;
+            }
             $products[] = [
                 'product_key' => $lineItem['node']['variant']['sku'],
                 'qty' => $qty,
-                'price' => $lineItem['node']['variant']['price'],
+                'price' => number_format($currentPrice, 2),
             ];
         }
         $result[] = [
