@@ -42,7 +42,7 @@ class SupabaseService
             $response->throw();
             return $response->json();
         } catch (\Exception $e) {
-            Log::error("SupabaseApi Service Error (getAll - $table): " . $e->getMessage());
+            Log::error("SupabaseApi Service Error (getAll - $table): ", [ $e ]);
             return [];
         }
     }
