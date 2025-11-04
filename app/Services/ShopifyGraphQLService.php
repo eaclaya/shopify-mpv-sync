@@ -532,15 +532,18 @@ class ShopifyGraphQLService
                         node {
                             id
                             title
-                            variants(first: 50) { # Opcional: Obtener variantes
+                            variants(first: 50) {
                                 edges {
                                     node {
+                                        id
+                                        title
+                                        price
+                                        inventoryQuantity
                                         sku
                                         inventoryItem {
                                             inventoryLevels(first: 5) {
                                                 edges {
                                                     node {
-                                                        available
                                                         location {
                                                             name
                                                         }
