@@ -518,4 +518,61 @@ class ShopifyGraphQLService
         $variables = ['orderNumber' => "name:#{$orderNumber}"];
         return $this->query($query, $variables);
     }
+
+    public function getProductsByPaginate(int $numProducts, ?string $cursor): ?array
+    {
+        $query = '
+            query getProducts($numProducts: Int!, $cursor: String) {
+                products(first: $numProducts, after: $cursor) {
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    edges {
+                        node {
+                            id
+                            title
+                            variants(first: 50) { # Opcional: Obtener variantes
+                                edges {
+                                    node {
+                                        sku
+                                        inventoryItem {
+                                            inventoryLevels(first: 5) {
+                                                edges {
+                                                    node {
+                                                        available
+                                                        location {
+                                                            name
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ';
+
+        $response = $this->query($query, [
+            'numProducts' => $numProducts,
+            'cursor' => $cursor
+        ]);
+
+        Log::info("con la siguiente configuracion, numero de productos {$numProducts}, cursor {$cursor}, tengo la siguiente respuesta: ", [ $response ]);
+
+        $edges = $response['data'] ?? null;
+        // $variantEdge = null;
+        // foreach ($edges as $edge) {
+        //     if (strtolower(trim($edge['node']['sku'])) === strtolower(trim($sku))) {
+        //         $variantEdge = $edge['node'];
+        //         break;
+        //     }
+        // }
+
+        return $edges ? $edges : null;
+    }
 }
