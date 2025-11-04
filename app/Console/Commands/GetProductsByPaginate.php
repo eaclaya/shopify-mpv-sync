@@ -48,8 +48,8 @@ class GetProductsByPaginate extends Command
                 'sku' => $edge['node']['variants']['edges'][0]['node']['sku'],
             ];
         }
-        Log::info('products: ', [ $products ]);
-        var_dump($products);
+        Log::info('products: ', [ $arrayProducts ]);
+        var_dump($arrayProducts);
         $this->info('Finish GetProductsByPaginate command...');
         return 0;
     }
