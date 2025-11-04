@@ -536,21 +536,9 @@ class ShopifyGraphQLService
                                 edges {
                                     node {
                                         id
-                                        title
                                         price
                                         inventoryQuantity
                                         sku
-                                        inventoryItem {
-                                            inventoryLevels(first: 5) {
-                                                edges {
-                                                    node {
-                                                        location {
-                                                            name
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }

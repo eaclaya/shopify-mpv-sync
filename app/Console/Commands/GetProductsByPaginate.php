@@ -34,14 +34,20 @@ class GetProductsByPaginate extends Command
         $this->info('Running GetProductsByPaginate command...');
 
         $products = ShopifyGraphQL::getProductsByPaginate(50, 'eyJsYXN0X2lkIjo3NzYwMTQyNjMxMTQwLCJsYXN0X3ZhbHVlIjoiNzc2MDE0MjYzMTE0MCJ9');
-        // $edgesPublications = $publications['data']['publications']['edges'];
-        // $arrayPublications = [];
-        // foreach ($edgesPublications as $edge) {
-        //     $arrayPublications[] = [
-        //         'publicationId' => $edge['node']['id'],
-        //         'publishDate' => null,
-        //     ];
-        // }
+        $edgesProducts = $products['products']['edges'];
+        $arrayProducts = [];
+        $arrayProducts['pageInfo'] = $products['products']['pageInfo'];
+        $arrayProducts['products'] = [];
+        foreach ($edgesProducts as $edge) {
+            $arrayProducts['products'][] = [
+                'productId' => $edge['node']['id'],
+                'title' => $edge['node']['title'],
+                'variantId' => $edge['node']['variants']['edges'][0]['node']['id'],
+                'price' => $edge['node']['variants']['edges'][0]['node']['price'],
+                'qty' => $edge['node']['variants']['edges'][0]['node']['inventoryQuantity'],
+                'sku' => $edge['node']['variants']['edges'][0]['node']['sku'],
+            ];
+        }
         Log::info('products: ', [ $products ]);
         var_dump($products);
         $this->info('Finish GetProductsByPaginate command...');
