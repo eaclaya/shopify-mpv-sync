@@ -125,7 +125,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'internal_bearer_token' => env('INTERNAL_BEARER_TOKEN', 0),
+    'internal_bearer_token' => env('INTERNAL_BEARER_TOKEN', '42ccd0251d486204d262cc4b2f6412a53268f238d99d871e91f65457151d89c4'),
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
