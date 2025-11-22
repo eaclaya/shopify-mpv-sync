@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckBearerToken
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        $authHeader = $request->header('Authorization');
+
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $token = substr($authHeader, 7);
+
+        $internalToken = config('app.internal_bearer_token', '42ccd0251d486204d262cc4b2f6412a53268f238d99d871e91f65457151d89c4');
+
+        if ($token !== $internalToken) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $next($request);
+    }
+}

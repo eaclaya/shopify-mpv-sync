@@ -16,16 +16,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::group(['middleware' => 'auth:sanctum'], function () {
-Route::post('/shopify/products', [ShopifyApiController::class, 'store']);
-Route::post('/shopify/products/update', [ShopifyApiController::class, 'update']);
+Route::group(['middleware' => 'check.bearer'], function () {
+    Route::post('/shopify/products', [ShopifyApiController::class, 'store']);
+    Route::post('/shopify/products/update', [ShopifyApiController::class, 'update']);
 
-Route::post('/shopify/get_orders', [ShopifyApiController::class, 'getOrders']);
+    Route::post('/shopify/get_orders', [ShopifyApiController::class, 'getOrders']);
 
-Route::post('/supabase/', [SupabaseApiController::class, 'store']);
-Route::post('/supabase/update', [SupabaseApiController::class, 'update']);
-Route::get('/supabase/get-all', [SupabaseApiController::class, 'getAll']);
-// });
+    Route::post('/supabase/', [SupabaseApiController::class, 'store']);
+    Route::post('/supabase/update', [SupabaseApiController::class, 'update']);
+    Route::get('/supabase/get-all', [SupabaseApiController::class, 'getAll']);
+});
 
 // Route::get('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
 // Route::post('/whatsapp/webhook', [WhatsappApiController::class, 'hook']);
