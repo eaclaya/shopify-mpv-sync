@@ -128,7 +128,7 @@ class ProductGraphQLRepository
                 'product_key' => $product['product_key'],
                 'error' => $e->getMessage(),
             ]);
-            throw new \Exception("Error al actualizar producto: {$product['product_key']}");
+            throw new \Exception("Error al actualizar producto: {$product['product_key']}: {$e->getMessage()}");
         }
     }
 
