@@ -92,35 +92,40 @@ class ShopifyApiController extends Controller
             return response()->json(['error' => 'No se recibio un numero de orden'], 500);
         }
         Log::info('E recibido el siguiente numero de orden: ', [ $orderNumber ]);
-        $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
-        $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
-        $lineItems = $edgesOrders['lineItems']['edges'];
-        $taxLines = $edgesOrders['taxLines'][0]['rate'];
-        $products = [];
-        foreach ($lineItems as $lineItem) {
-            $qty = $lineItem['node']['currentQuantity'];
-            if ($qty == 0) {
-                continue;
+        try {
+            $orders = ShopifyGraphQL::getOrdersByNumber($orderNumber);
+            $edgesOrders = $orders['data']['orders']['edges'][0]['node'];
+            $lineItems = $edgesOrders['lineItems']['edges'];
+            $taxLines = $edgesOrders['taxLines'][0]['rate'];
+            $products = [];
+            foreach ($lineItems as $lineItem) {
+                $qty = $lineItem['node']['currentQuantity'];
+                if ($qty == 0) {
+                    continue;
+                }
+                $currentPrice = $price = $lineItem['node']['variant']['price'];
+                $discountPrice = isset($lineItem['node']['discountedTotalSet']['shopMoney']['amount']) && !empty($lineItem['node']['discountedTotalSet']['shopMoney']['amount'])
+                        ? $lineItem['node']['discountedTotalSet']['shopMoney']['amount'] : null;
+                if (isset($discountPrice) && $discountPrice < $price) {
+                    $currentPrice = $discountPrice;
+                }
+                $products[] = [
+                    'product_key' => $lineItem['node']['variant']['sku'],
+                    'qty' => $qty,
+                    'price' => number_format($currentPrice, 2),
+                ];
             }
-            $currentPrice = $price = $lineItem['node']['variant']['price'];
-            $discountPrice = isset($lineItem['node']['discountedTotalSet']['shopMoney']['amount']) && !empty($lineItem['node']['discountedTotalSet']['shopMoney']['amount'])
-                    ? $lineItem['node']['discountedTotalSet']['shopMoney']['amount'] : null;
-            if (isset($discountPrice) && $discountPrice < $price) {
-                $currentPrice = $discountPrice;
-            }
-            $products[] = [
-                'product_key' => $lineItem['node']['variant']['sku'],
-                'qty' => $qty,
-                'price' => number_format($currentPrice, 2),
+            $result[] = [
+                'client' => $edgesOrders['customer'],
+                'address' => $edgesOrders['shippingAddress'],
+                'products' => $products,
+                'rate' => $taxLines,
             ];
+            Log::info('orders: ', [ $result ]);
+            return response()->json(['orders' => $result], 200);
+        } catch (\Exception $e) {
+            Log::error('Hubo un error en el controlador: ', [$e->getMessage()]);
+            return response()->json(['error' => 'Error fetching pedidos: ' . $e->getMessage()], 500);
         }
-        $result[] = [
-            'client' => $edgesOrders['customer'],
-            'address' => $edgesOrders['shippingAddress'],
-            'products' => $products,
-            'rate' => $taxLines,
-        ];
-        Log::info('orders: ', [ $result ]);
-        return response()->json(['orders' => $result], 200);
     }
 }
