@@ -26,11 +26,9 @@ class ShopifyApiController extends Controller
                 $product = $data;
                 Log::info('E recibido el siguiente producto: ', $product);
                 if ($product['product_key'] && $product['notes'] && $product['price']) {
-                    Log::info('pase la prueba con el producto: ', $product);
                     if (!isset($product['shopify_product_id'])) {
                         Log::info('no tenia shopify_product_id y prosigo a crearlo: ', $product);
                         $result = $this->productRepository->create($product);
-                        Log::info('cree el shopify_product_id: ', $result);
                     } else {
                         Log::info('si tenia el shopify_product_id: ', $result);
                         $result = $product;
