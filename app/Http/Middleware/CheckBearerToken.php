@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CheckBearerToken
 {
@@ -16,8 +17,9 @@ class CheckBearerToken
      */
     public function handle(Request $request, Closure $next)
     {
+        Log::info('entro en el middleware');
         $authHeader = $request->header('Authorization');
-
+        Log::info($authHeader);
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
