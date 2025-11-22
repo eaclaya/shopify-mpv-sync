@@ -21,12 +21,13 @@ class CheckBearerToken
         $authHeader = $request->header('Authorization');
         Log::info($authHeader);
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            Log::info('Unauthorized');
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         $token = substr($authHeader, 7);
 
-        $internalToken = config('app.internal_bearer_token', '42ccd0251d486204d262cc4b2f6412a53268f238d99d871e91f65457151d89c4');
+        $internalToken = '3|'.config('app.internal_bearer_token', '42ccd0251d486204d262cc4b2f6412a53268f238d99d871e91f65457151d89c4');
 
         if ($token !== $internalToken) {
             return response()->json(['message' => 'Unauthorized'], 401);
