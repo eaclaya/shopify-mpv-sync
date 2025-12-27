@@ -58,7 +58,7 @@ class ProductGraphQLRepository
         try {
             $title = $product['notes'];
             $imageUrl = isset($product['picture']) ? $product['picture'] : null;
-            $price = $product['price'];
+            // $price = $product['price'];
             $productGlobalId = $product['shopify_product_id'];
             $productGlobalId = ShopifyGraphQL::toGlobalId('Product', $productGlobalId);
 
@@ -68,7 +68,7 @@ class ProductGraphQLRepository
             );
 
             if (!isset($imageUrl) || trim($imageUrl) === '') {
-                $updateImageResponse = 'No se puede actualizar la imagen del producto porque no se proporcionó una URL válida.';
+                $updateImageResponse = 'No se proporcionó una Imagen del Producto.';
             } else {
                 $isOk = false;
                 try {
@@ -104,10 +104,10 @@ class ProductGraphQLRepository
                 $product['qty']
             );
 
-            $updatePriceResponse = ShopifyGraphQL::updatePriceByVariant(
-                $variantId,
-                $price,
-            );
+            // $updatePriceResponse = ShopifyGraphQL::updatePriceByVariant(
+            //     $variantId,
+            //     $price,
+            // );
 
             Log::info('Producto actualizado correctamente:', [
                 'product_key' => $product['product_key'],
@@ -115,7 +115,7 @@ class ProductGraphQLRepository
                     'product' => $updateProductResponse,
                     'image' => $updateImageResponse,
                     'inventory' => $updateInventoryResponse,
-                    'price' => $updatePriceResponse
+                    // 'price' => $updatePriceResponse
                 ]
             ]);
 
