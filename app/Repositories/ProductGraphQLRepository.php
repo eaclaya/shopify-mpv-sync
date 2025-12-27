@@ -104,10 +104,10 @@ class ProductGraphQLRepository
                 $product['qty']
             );
 
-            // $updatePriceResponse = ShopifyGraphQL::updatePriceByVariant(
-            //     $variantId,
-            //     $price,
-            // );
+            $updatePriceResponse = ShopifyGraphQL::updatePriceByVariant(
+                $variantId,
+                $price,
+            );
 
             Log::info('Producto actualizado correctamente:', [
                 'product_key' => $product['product_key'],
@@ -115,7 +115,7 @@ class ProductGraphQLRepository
                     'product' => $updateProductResponse,
                     'image' => $updateImageResponse,
                     'inventory' => $updateInventoryResponse,
-                    // 'price' => $updatePriceResponse
+                    'price' => $updatePriceResponse
                 ]
             ]);
 
