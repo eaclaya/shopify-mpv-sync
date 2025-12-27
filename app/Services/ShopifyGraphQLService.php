@@ -176,11 +176,11 @@ class ShopifyGraphQLService
     public function updatePriceByVariant(string $productVariantGlobalId, int $newPrice): array
     {
         $mutation = '
-            mutation productVariantUpdate($input: ProductVariantInput!) {
-                productVariantUpdate(input: $input) {
-                    productVariant {
+            mutation updateProductVariantPricing($input: ProductSetInput!, $synchronous: Boolean!, $identifier: ProductSetIdentifiers) {
+                productSet(synchronous: $synchronous, input: $input, identifier: $identifier) {
+                    product {
                         id
-                        price
+                        title
                     }
                     userErrors {
                         field
@@ -191,9 +191,17 @@ class ShopifyGraphQLService
         ';
 
         $variables = [
+            'synchronous' => true,
+            'identifier' => [
+                'variantId' => $productVariantGlobalId
+            ],
             'input' => [
-                'id' => $productVariantGlobalId,
-                'price' => number_format($newPrice, 2, '.', ''),
+                'variants' => [
+                    [
+                        'id' => $productVariantGlobalId,
+                        'price' => number_format($newPrice, 2, '.', '')
+                    ]
+                ]
             ]
         ];
 
