@@ -45,7 +45,7 @@ class ProductGraphQLRepository
         if (is_object($product)) {
             $product = (array) $product;
         }
-        if (!isset($product['shopify_product_id'])) {
+        if (!isset($product['shopify_product_id']) || is_null($product['shopify_product_id'])) {
             $variantInfo = ShopifyGraphQL::getProductAndVariantBySku($product['product_key']);
             if (!$variantInfo) {
                 Log::error('Producto no tiene ID de producto de Shopify: ', [$product]);
@@ -134,10 +134,10 @@ class ProductGraphQLRepository
 
     public function create($product)
     {
-        if (!isset($product['picture'])) {
-            Log::error('Producto no tiene imagen: ', [$product]);
-            throw new \Exception("Producto no tiene imagen: {$product['product_key']}");
-        }
+        // if (!isset($product['picture'])) {
+        //     Log::error('Producto no tiene imagen: ', [$product]);
+        //     throw new \Exception("Producto no tiene imagen: {$product['product_key']}");
+        // }
 
         if (is_object($product)) {
             $product = (array) $product;
@@ -169,7 +169,7 @@ class ProductGraphQLRepository
                     }
                     ShopifyGraphQL::setPublicationsInToProduct($productId, $arrayPublications);
                 } else {
-                    throw new \Exception("No se encontró la variante para el SKU: {$product['product_key']}");
+                    throw new \Exception("No se creo la variante para el SKU: {$product['product_key']}");
                 }
             } else {
                 $parts = explode('/', $variantInfo['productId']);
