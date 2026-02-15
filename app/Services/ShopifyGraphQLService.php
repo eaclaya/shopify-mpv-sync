@@ -338,19 +338,6 @@ class ShopifyGraphQLService
                         status
                         publishedAt
                         onlineStoreUrl
-                        variants(first: 1) {
-                            edges {
-                                node {
-                                    id
-                                    price
-                                    sku
-                                    inventoryItem {
-                                        id
-                                        tracked
-                                    }
-                                }
-                            }
-                        }
                     }
                     userErrors {
                         field
@@ -366,12 +353,42 @@ class ShopifyGraphQLService
                 'vendor' => 'KM Motos',
                 'status' => 'ACTIVE',
                 'published' => true,
-                'variants' => [
-                    [
-                        'price' => number_format($product['price'], 2, '.', ''),
-                        'sku' => $product['product_key'],
-                    ]
-                ],
+            ]
+        ];
+
+        return $this->mutation($mutation, $variables);
+    }
+
+    /**
+     * Crea una variante para un producto dado su ID global de Shopify, el SKU y precio.
+     * @param string $productId
+     * @param string $sku
+     * @param string $price
+     * @return array
+     */
+    public function createVariantForProduct(string $productId, string $sku, string $price): array
+    {
+        $mutation = '
+            mutation productVariantCreate($input: ProductVariantInput!) {
+                productVariantCreate(input: $input) {
+                    productVariant {
+                        id
+                        sku
+                        price
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+
+        $variables = [
+            'input' => [
+                'productId' => $productId,
+                'sku' => $sku,
+                'price' => $price
             ]
         ];
 

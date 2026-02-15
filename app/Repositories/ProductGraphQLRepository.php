@@ -158,6 +158,21 @@ class ProductGraphQLRepository
                     $product['shopify_product_id'] = $productId;
                     $product['id'] = $productId;
 
+                    // Crear el variant (SKU y precio)
+                    $variantShopifyResponse = ShopifyGraphQL::createVariantForProduct(
+                        $createProduct['id'],
+                        $product['product_key'],
+                        number_format($product['price'], 2, '.', '')
+                    );
+                    Log::info('Respuesta al crear variante para el Producto:', [$variantShopifyResponse]);
+                    if (!empty($variantShopifyResponse['data']['productVariantCreate']['productVariant']['id'])) {
+                        $variantId = $variantShopifyResponse['data']['productVariantCreate']['productVariant']['id'];
+                        $product['shopify_variant_id'] = $variantId;
+                    } else {
+                        Log::error('No se pudo crear la variante para el producto:', [$variantShopifyResponse]);
+                        throw new \Exception("No se pudo crear la variante para el SKU: {$product['product_key']}");
+                    }
+
                     $publications = ShopifyGraphQL::getPublications();
                     $edgesPublications = $publications['data']['publications']['edges'];
                     $arrayPublications = [];
@@ -169,7 +184,7 @@ class ProductGraphQLRepository
                     }
                     ShopifyGraphQL::setPublicationsInToProduct($productId, $arrayPublications);
                 } else {
-                    throw new \Exception("No se creo la variante para el SKU: {$product['product_key']}");
+                    throw new \Exception("No se creó el producto para el SKU: {$product['product_key']}");
                 }
             } else {
                 $parts = explode('/', $variantInfo['productId']);
