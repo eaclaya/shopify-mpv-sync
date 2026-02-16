@@ -369,7 +369,7 @@ class ShopifyGraphQLService
     public function createVariantForProduct(string $productId, string $sku, string $price): array
     {
         $mutation = '
-            mutation productVariantsBulkCreate($productId: ID!, $variants: [ProductVariantBulkInput!]!) {
+            mutation productVariantsBulkCreate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
                 productVariantsBulkCreate(productId: $productId, variants: $variants) {
                     productVariants {
                         id
