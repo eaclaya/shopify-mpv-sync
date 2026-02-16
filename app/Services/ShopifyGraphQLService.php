@@ -369,9 +369,9 @@ class ShopifyGraphQLService
     public function createVariantForProduct(string $productId, string $sku, string $price): array
     {
         $mutation = '
-            mutation productVariantCreate($input: ProductVariantInput!) {
-                productVariantCreate(input: $input) {
-                    productVariant {
+            mutation productVariantsBulkCreate($productId: ID!, $variants: [ProductVariantBulkInput!]!) {
+                productVariantsBulkCreate(productId: $productId, variants: $variants) {
+                    productVariants {
                         id
                         sku
                         price
@@ -385,10 +385,12 @@ class ShopifyGraphQLService
         ';
 
         $variables = [
-            'input' => [
-                'productId' => $productId,
-                'sku' => $sku,
-                'price' => $price
+            'productId' => $productId,
+            'variants' => [
+                [
+                    'sku' => $sku,
+                    'price' => $price
+                ]
             ]
         ];
 
