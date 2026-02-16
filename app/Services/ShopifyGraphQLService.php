@@ -373,8 +373,12 @@ class ShopifyGraphQLService
                 productVariantsBulkCreate(productId: $productId, variants: $variants) {
                     productVariants {
                         id
-                        sku
+                        title
                         price
+                        inventoryItem {
+                            id
+                            sku
+                        }
                     }
                     userErrors {
                         field
@@ -388,8 +392,10 @@ class ShopifyGraphQLService
             'productId' => $productId,
             'variants' => [
                 [
-                    'sku' => $sku,
-                    'price' => $price
+                    'price' => $price,
+                    "inventoryItem" => [
+                        'sku' => $sku,
+                    ]
                 ]
             ]
         ];
