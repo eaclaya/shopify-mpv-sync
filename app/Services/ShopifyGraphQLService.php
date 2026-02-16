@@ -338,6 +338,13 @@ class ShopifyGraphQLService
                         status
                         publishedAt
                         onlineStoreUrl
+                        variants(first: 1) {
+                            edges {
+                                node {
+                                    id
+                                }
+                            }
+                        }
                     }
                     userErrors {
                         field
@@ -402,13 +409,6 @@ class ShopifyGraphQLService
         return $this->mutation($mutation, $variables);
     }
 
-    /**
-     * Actualiza la variante por defecto creada automáticamente por Shopify.
-     * @param string $variantGlobalId
-     * @param string $sku
-     * @param string $price
-     * @return array
-     */
     public function updateVariantById(string $variantGlobalId, string $sku, string $price): array
     {
         $mutation = '
