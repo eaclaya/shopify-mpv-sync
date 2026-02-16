@@ -373,7 +373,6 @@ class ShopifyGraphQLService
                 productVariantsBulkCreate(productId: $productId, variants: $variants) {
                     productVariants {
                         id
-                        title
                         price
                         inventoryItem {
                             id
@@ -400,6 +399,45 @@ class ShopifyGraphQLService
             ]
         ];
 
+        return $this->mutation($mutation, $variables);
+    }
+
+    /**
+     * Actualiza la variante por defecto creada automáticamente por Shopify.
+     * @param string $variantGlobalId
+     * @param string $sku
+     * @param string $price
+     * @return array
+     */
+    public function updateVariantById(string $variantGlobalId, string $sku, string $price): array
+    {
+        $mutation = '
+            mutation productVariantUpdate($input: ProductVariantInput!) {
+                productVariantUpdate(input: $input) {
+                    productVariant {
+                        id
+                        price
+                        inventoryItem {
+                            id
+                            sku
+                        }
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+        $variables = [
+            'input' => [
+                'id' => $variantGlobalId,
+                'price' => $price,
+                'inventoryItem' => [
+                    'sku' => $sku,
+                ],
+            ],
+        ];
         return $this->mutation($mutation, $variables);
     }
 

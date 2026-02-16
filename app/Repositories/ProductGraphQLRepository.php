@@ -158,20 +158,18 @@ class ProductGraphQLRepository
                     $product['shopify_product_id'] = $productId;
                     $product['id'] = $productId;
 
-                    // Crear el variant (SKU y precio)
-                    $variantShopifyResponse = ShopifyGraphQL::createVariantForProduct(
-                        $createProduct['id'],
+                    // Extraer la variante creada automáticamente y actualizarla con SKU y precio
+                    $variantEdges = $createProductResponse['data']['productCreate']['product']['variants']['edges'] ?? null;
+                    if (empty($variantEdges)) throw new Exception("No variant después de crear producto");
+                    $variantId = $variantEdges[0]['node']['id'];
+
+                    $variantShopifyResponse = ShopifyGraphQL::updateVariantById(
+                        $variantId,
                         $product['product_key'],
                         number_format($product['price'], 2, '.', '')
                     );
-                    Log::info('Respuesta al crear variante para el Producto:', [$variantShopifyResponse]);
-                    if (!empty($variantShopifyResponse['data']['productVariantCreate']['productVariant']['id'])) {
-                        $variantId = $variantShopifyResponse['data']['productVariantCreate']['productVariant']['id'];
-                        $product['shopify_variant_id'] = $variantId;
-                    } else {
-                        Log::error('No se pudo crear la variante para el producto:', [$variantShopifyResponse]);
-                        throw new \Exception("No se pudo crear la variante para el SKU: {$product['product_key']}");
-                    }
+                    Log::info('Respuesta al actualizar variante default:', [$variantShopifyResponse]);
+                    $product['shopify_variant_id'] = $variantId;
 
                     $publications = ShopifyGraphQL::getPublications();
                     $edgesPublications = $publications['data']['publications']['edges'];
@@ -193,7 +191,7 @@ class ProductGraphQLRepository
                 $product['id'] = $productId;
             }
 
-            Log::error('Producto creado exitosamente: ', [$product]);
+            Log::info('Producto creado exitosamente: ', [$product]);
             return $product;
         } catch (\Exception $e) {
             Log::error('Error al crear producto:', [
