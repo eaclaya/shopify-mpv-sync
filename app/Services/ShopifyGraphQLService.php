@@ -409,12 +409,12 @@ class ShopifyGraphQLService
         return $this->mutation($mutation, $variables);
     }
 
-    public function updateVariantById(string $variantGlobalId, string $sku, string $price): array
+    public function updateVariantById(string $productGlobalId, string $variantGlobalId, string $sku, string $price): array
     {
         $mutation = '
-            mutation productVariantUpdate($input: ProductVariantInput!) {
-                productVariantUpdate(input: $input) {
-                    productVariant {
+            mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+                productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+                    productVariants {
                         id
                         price
                         inventoryItem {
@@ -429,12 +429,16 @@ class ShopifyGraphQLService
                 }
             }
         ';
+
         $variables = [
-            'input' => [
-                'id' => $variantGlobalId,
-                'price' => $price,
-                'inventoryItem' => [
-                    'sku' => $sku,
+            'productId' => $productGlobalId,
+            'variants' => [
+                [
+                    'id' => $variantGlobalId,
+                    'price' => $price,
+                    'inventoryItem' => [
+                        'sku' => $sku,
+                    ],
                 ],
             ],
         ];

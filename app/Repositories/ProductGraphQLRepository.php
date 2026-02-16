@@ -160,10 +160,13 @@ class ProductGraphQLRepository
 
                     // Extraer la variante creada automáticamente y actualizarla con SKU y precio
                     $variantEdges = $createProductResponse['data']['productCreate']['product']['variants']['edges'] ?? null;
-                    if (empty($variantEdges)) throw new Exception("No variant después de crear producto");
+                    if (empty($variantEdges)) {
+                        throw new Exception("No variant después de crear producto");
+                    }
                     $variantId = $variantEdges[0]['node']['id'];
 
                     $variantShopifyResponse = ShopifyGraphQL::updateVariantById(
+                        $createProduct['id'],
                         $variantId,
                         $product['product_key'],
                         number_format($product['price'], 2, '.', '')
